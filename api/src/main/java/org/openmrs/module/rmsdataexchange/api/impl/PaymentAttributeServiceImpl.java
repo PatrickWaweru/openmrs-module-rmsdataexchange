@@ -15,10 +15,8 @@ import java.util.List;
 
 public class PaymentAttributeServiceImpl extends BaseOpenmrsService implements PaymentAttributeService {
 	
-	private SessionFactory sessionFactory;
-
 	RmsdataexchangeDao dao;
-
+	
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -26,113 +24,73 @@ public class PaymentAttributeServiceImpl extends BaseOpenmrsService implements P
 		this.dao = dao;
 	}
 	
-	@Autowired
-	public PaymentAttributeServiceImpl(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-	
 	@Override
 	public PaymentAttribute savePaymentAttribute(PaymentAttribute paymentAttribute) {
-		sessionFactory.getCurrentSession().saveOrUpdate(paymentAttribute);
-		return paymentAttribute;
+		return dao.savePaymentAttribute(paymentAttribute);
 	}
 	
 	@Override
 	public PaymentAttribute getPaymentAttribute(Integer paymentAttributeId) {
-		return sessionFactory.getCurrentSession().get(PaymentAttribute.class, paymentAttributeId);
+		return dao.getPaymentAttribute(paymentAttributeId);
 	}
 	
 	@Override
 	public void deletePaymentAttribute(PaymentAttribute paymentAttribute) {
-		sessionFactory.getCurrentSession().delete(paymentAttribute);
+		dao.deletePaymentAttribute(paymentAttribute);
 	}
 	
 	@Override
 	public List<PaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId) {
-		return sessionFactory.getCurrentSession()
-		        .createQuery("from PaymentAttribute where billPaymentId = :paymentId", PaymentAttribute.class)
-		        .setParameter("paymentId", paymentId).getResultList();
+		return dao.getPaymentAttributesByPaymentId(paymentId);
 	}
 	
 	@Override
 	public List<PaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId) {
-		return sessionFactory.getCurrentSession()
-		        .createQuery("from PaymentAttribute where paymentAttributeTypeId = :typeId", PaymentAttribute.class)
-		        .setParameter("typeId", paymentAttributeTypeId).getResultList();
+		return dao.getPaymentAttributesByTypeId(paymentAttributeTypeId);
 	}
 	
 	@Override
 	public List<PaymentAttribute> getAllPaymentAttributes(Boolean includeVoided) {
-		String query = "from PaymentAttribute";
-		if (!includeVoided) {
-			query += " where voided = false";
-		}
-		return sessionFactory.getCurrentSession().createQuery(query, PaymentAttribute.class).getResultList();
+		return dao.getAllPaymentAttributes(includeVoided);
 	}
 	
 	@Override
 	public PaymentAttributeType savePaymentAttributeType(PaymentAttributeType paymentAttributeType) {
-		sessionFactory.getCurrentSession().saveOrUpdate(paymentAttributeType);
-		return paymentAttributeType;
+		return dao.savePaymentAttributeType(paymentAttributeType);
 	}
 	
 	@Override
 	public PaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
-		return sessionFactory.getCurrentSession().get(PaymentAttributeType.class, paymentAttributeTypeId);
+		return dao.getPaymentAttributeType(paymentAttributeTypeId);
 	}
 	
 	@Override
 	public List<PaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired) {
-		String query = "from PaymentAttributeType";
-		if (!includeRetired) {
-			query += " where retired = false";
-		}
-		return sessionFactory.getCurrentSession().createQuery(query, PaymentAttributeType.class).getResultList();
+		return dao.getAllPaymentAttributeTypes(includeRetired);
 	}
 	
 	@Override
 	public void voidPaymentAttribute(PaymentAttribute paymentAttribute, String reason, Integer voidedBy) {
-		paymentAttribute.setVoided(true);
-		paymentAttribute.setVoidedBy(voidedBy);
-		paymentAttribute.setDateVoided(new Date());
-		paymentAttribute.setVoidReason(reason);
-		savePaymentAttribute(paymentAttribute);
+		dao.voidPaymentAttribute(paymentAttribute, reason, voidedBy);
 	}
 	
 	@Override
 	public void unvoidPaymentAttribute(PaymentAttribute paymentAttribute) {
-		paymentAttribute.setVoided(false);
-		paymentAttribute.setVoidedBy(null);
-		paymentAttribute.setDateVoided(null);
-		paymentAttribute.setVoidReason(null);
-		savePaymentAttribute(paymentAttribute);
+		dao.unvoidPaymentAttribute(paymentAttribute);
 	}
 	
 	@Override
 	public void retirePaymentAttributeType(PaymentAttributeType paymentAttributeType, String reason, Integer retiredBy) {
-		paymentAttributeType.setRetired(true);
-		paymentAttributeType.setRetiredBy(retiredBy);
-		paymentAttributeType.setDateRetired(new Date());
-		paymentAttributeType.setRetireReason(reason);
-		savePaymentAttributeType(paymentAttributeType);
+		dao.retirePaymentAttributeType(paymentAttributeType, reason, retiredBy);
 	}
 	
 	@Override
 	public void unretirePaymentAttributeType(PaymentAttributeType paymentAttributeType) {
-		paymentAttributeType.setRetired(false);
-		paymentAttributeType.setRetiredBy(null);
-		paymentAttributeType.setDateRetired(null);
-		paymentAttributeType.setRetireReason(null);
-		savePaymentAttributeType(paymentAttributeType);
+		dao.unretirePaymentAttributeType(paymentAttributeType);
 	}
 	
 	@Override
 	public List<PaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid) {
-		return sessionFactory
-		        .getCurrentSession()
-		        .createQuery(
-		            "from PaymentAttribute pa " + "join CashierBillPayment bp on pa.billPaymentId = bp.billPaymentId "
-		                    + "where bp.uuid = :paymentUuid", PaymentAttribute.class)
-		        .setParameter("paymentUuid", paymentUuid).getResultList();
+		return dao.getPaymentAttributesByPaymentUuid(paymentUuid);
 	}
 }

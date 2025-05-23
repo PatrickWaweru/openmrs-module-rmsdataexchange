@@ -15,10 +15,8 @@ import java.util.List;
 
 public class BillAttributeServiceImpl extends BaseOpenmrsService implements BillAttributeService {
 	
-	private SessionFactory sessionFactory;
-
 	RmsdataexchangeDao dao;
-
+	
 	/**
 	 * Injected in moduleApplicationContext.xml
 	 */
@@ -26,113 +24,73 @@ public class BillAttributeServiceImpl extends BaseOpenmrsService implements Bill
 		this.dao = dao;
 	}
 	
-	@Autowired
-	public BillAttributeServiceImpl(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-	
 	@Override
 	public BillAttribute saveBillAttribute(BillAttribute billAttribute) {
-		sessionFactory.getCurrentSession().saveOrUpdate(billAttribute);
-		return billAttribute;
+		return dao.saveBillAttribute(billAttribute);
 	}
 	
 	@Override
 	public BillAttribute getBillAttribute(Integer billAttributeId) {
-		return sessionFactory.getCurrentSession().get(BillAttribute.class, billAttributeId);
+		return dao.getBillAttribute(billAttributeId);
 	}
 	
 	@Override
 	public void deleteBillAttribute(BillAttribute billAttribute) {
-		sessionFactory.getCurrentSession().delete(billAttribute);
+		dao.deleteBillAttribute(billAttribute);
 	}
 	
 	@Override
 	public List<BillAttribute> getBillAttributesByBillId(Integer billId) {
-		return sessionFactory.getCurrentSession()
-		        .createQuery("from CashierBillAttribute where billId = :billId", BillAttribute.class)
-		        .setParameter("billId", billId).getResultList();
+		return dao.getBillAttributesByBillId(billId);
 	}
 	
 	@Override
 	public List<BillAttribute> getBillAttributesByBillUuid(String billUuid) {
-		return sessionFactory
-		        .getCurrentSession()
-		        .createQuery(
-		            "from CashierBillAttribute ba " + "join CashierBill b on ba.billId = b.billId "
-		                    + "where b.uuid = :billUuid", BillAttribute.class).setParameter("billUuid", billUuid)
-		        .getResultList();
+		return dao.getBillAttributesByBillUuid(billUuid);
 	}
 	
 	@Override
 	public List<BillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId) {
-		return sessionFactory.getCurrentSession()
-		        .createQuery("from CashierBillAttribute where paymentAttributeTypeId = :typeId", BillAttribute.class)
-		        .setParameter("typeId", billAttributeTypeId).getResultList();
+		return dao.getBillAttributesByTypeId(billAttributeTypeId);
 	}
 	
 	@Override
 	public List<BillAttribute> getAllBillAttributes(Boolean includeVoided) {
-		String query = "from CashierBillAttribute";
-		if (!includeVoided) {
-			query += " where voided = false";
-		}
-		return sessionFactory.getCurrentSession().createQuery(query, BillAttribute.class).getResultList();
+		return dao.getAllBillAttributes(includeVoided);
 	}
 	
 	@Override
 	public BillAttributeType saveBillAttributeType(BillAttributeType billAttributeType) {
-		sessionFactory.getCurrentSession().saveOrUpdate(billAttributeType);
-		return billAttributeType;
+		return dao.saveBillAttributeType(billAttributeType);
 	}
 	
 	@Override
 	public BillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
-		return sessionFactory.getCurrentSession().get(BillAttributeType.class, billAttributeTypeId);
+		return dao.getBillAttributeType(billAttributeTypeId);
 	}
 	
 	@Override
 	public List<BillAttributeType> getAllBillAttributeTypes(Boolean includeRetired) {
-		String query = "from CashierBillAttributeType";
-		if (!includeRetired) {
-			query += " where retired = false";
-		}
-		return sessionFactory.getCurrentSession().createQuery(query, BillAttributeType.class).getResultList();
+		return dao.getAllBillAttributeTypes(includeRetired);
 	}
 	
 	@Override
 	public void voidBillAttribute(BillAttribute billAttribute, String reason, Integer voidedBy) {
-		billAttribute.setVoided(true);
-		billAttribute.setVoidedBy(voidedBy);
-		billAttribute.setDateVoided(new Date());
-		billAttribute.setVoidReason(reason);
-		saveBillAttribute(billAttribute);
+		dao.voidBillAttribute(billAttribute, reason, voidedBy);
 	}
 	
 	@Override
 	public void unvoidBillAttribute(BillAttribute billAttribute) {
-		billAttribute.setVoided(false);
-		billAttribute.setVoidedBy(null);
-		billAttribute.setDateVoided(null);
-		billAttribute.setVoidReason(null);
-		saveBillAttribute(billAttribute);
+		dao.unvoidBillAttribute(billAttribute);
 	}
 	
 	@Override
 	public void retireBillAttributeType(BillAttributeType billAttributeType, String reason, Integer retiredBy) {
-		billAttributeType.setRetired(true);
-		billAttributeType.setRetiredBy(retiredBy);
-		billAttributeType.setDateRetired(new Date());
-		billAttributeType.setRetireReason(reason);
-		saveBillAttributeType(billAttributeType);
+		dao.retireBillAttributeType(billAttributeType, reason, retiredBy);
 	}
 	
 	@Override
 	public void unretireBillAttributeType(BillAttributeType billAttributeType) {
-		billAttributeType.setRetired(false);
-		billAttributeType.setRetiredBy(null);
-		billAttributeType.setDateRetired(null);
-		billAttributeType.setRetireReason(null);
-		saveBillAttributeType(billAttributeType);
+		dao.unretireBillAttributeType(billAttributeType);
 	}
 }
