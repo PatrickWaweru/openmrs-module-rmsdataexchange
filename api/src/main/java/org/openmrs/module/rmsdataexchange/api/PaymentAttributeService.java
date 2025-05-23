@@ -1,5 +1,6 @@
 package org.openmrs.module.rmsdataexchange.api;
 
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttributeType;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-public interface PaymentAttributeService {
+public interface PaymentAttributeService extends OpenmrsService {
 	
 	// CRUD Operations
 	PaymentAttribute savePaymentAttribute(PaymentAttribute paymentAttribute);

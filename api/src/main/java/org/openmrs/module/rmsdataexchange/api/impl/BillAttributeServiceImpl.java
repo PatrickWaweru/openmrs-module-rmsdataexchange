@@ -2,7 +2,9 @@ package org.openmrs.module.rmsdataexchange.api.impl;
 
 import org.hibernate.SessionFactory;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.rmsdataexchange.api.BillAttributeService;
+import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.openmrs.module.rmsdataexchange.queue.model.BillAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.BillAttributeType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +13,18 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-@Service("billAttributeService")
-public class BillAttributeServiceImpl implements BillAttributeService {
+public class BillAttributeServiceImpl extends BaseOpenmrsService implements BillAttributeService {
 	
 	private SessionFactory sessionFactory;
+
+	RmsdataexchangeDao dao;
+
+	/**
+	 * Injected in moduleApplicationContext.xml
+	 */
+	public void setDao(RmsdataexchangeDao dao) {
+		this.dao = dao;
+	}
 	
 	@Autowired
 	public BillAttributeServiceImpl(SessionFactory sessionFactory) {

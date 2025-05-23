@@ -1,5 +1,6 @@
 package org.openmrs.module.rmsdataexchange.api;
 
+import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.rmsdataexchange.queue.model.BillAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.BillAttributeType;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-public interface BillAttributeService {
+public interface BillAttributeService extends OpenmrsService {
 	
 	// CRUD Operations
 	BillAttribute saveBillAttribute(BillAttribute billAttribute);

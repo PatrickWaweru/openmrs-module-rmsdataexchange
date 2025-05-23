@@ -1,20 +1,30 @@
 package org.openmrs.module.rmsdataexchange.api.impl;
 
 import org.openmrs.module.rmsdataexchange.api.PaymentAttributeService;
+import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.hibernate.SessionFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttributeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.openmrs.api.impl.BaseOpenmrsService;
 
 import java.util.Date;
 import java.util.List;
 
-@Service("paymentAttributeService")
-public class PaymentAttributeServiceImpl implements PaymentAttributeService {
+public class PaymentAttributeServiceImpl extends BaseOpenmrsService implements PaymentAttributeService {
 	
 	private SessionFactory sessionFactory;
+
+	RmsdataexchangeDao dao;
+
+	/**
+	 * Injected in moduleApplicationContext.xml
+	 */
+	public void setDao(RmsdataexchangeDao dao) {
+		this.dao = dao;
+	}
 	
 	@Autowired
 	public PaymentAttributeServiceImpl(SessionFactory sessionFactory) {
