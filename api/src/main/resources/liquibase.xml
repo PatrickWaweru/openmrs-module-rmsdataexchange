@@ -91,7 +91,7 @@
     </changeSet>
 
     <!-- create cashier_bill_attribute_type table -->
-    <changeSet id="kenyaemr_rms_data_exchange_create-cashier-bill-attribute-type-table" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_cashier-bill-attribute-type-20250525" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="cashier_bill_attribute_type"/>
@@ -199,7 +199,7 @@
     </changeSet>
 
     <!-- create cashier_payment_attribute_type table -->
-    <changeSet id="kenyaemr_rms_data_exchange_create-cashier-payment-attribute-type-table" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_cashier-payment-attr-type-20250525" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="cashier_payment_attribute_type"/>
@@ -307,7 +307,7 @@
     </changeSet>
 
     <!-- Create table to store Cashier Bill Attributes -->
-    <!-- <changeSet id="kenyaemr_rms_data_exchange_cashier_bill_attribute_table_20250417_100054" author="pwaweru">
+    <!-- <changeSet id="kenyaemr_rms_data_exchange_cashier_bill_attribute_20250417" author="pwaweru">
 
         <preConditions onFail="MARK_RAN">
             <not>
@@ -346,7 +346,7 @@
     </changeSet> -->
 
     <!-- create cashier_bill_attribute table -->
-    <changeSet id="kenyaemr_rms_data_exchange_cashier_bill_attribute_table_20250417_100054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_cashier_bill_attribute_20250417" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="cashier_bill_attribute"/>
@@ -450,7 +450,7 @@
     </changeSet>
 
     <!-- create cashier_payment_attribute table -->
-    <changeSet id="kenyaemr_rms_data_exchange_create-cashier-payment-attribute-table" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_cashier-payment-attribute_20250524" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="cashier_payment_attribute"/>
@@ -554,7 +554,7 @@
     </changeSet>
 
     <!-- Inserting RMS System Synchronized to bill attribute types table -->
-    <changeSet id="kenyaemr_rms_data_exchange_add_rms_synced_to_bill_attribute_types_20250423_200054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_rms_synced_to_bill_attribute_types" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM cashier_bill_attribute_type
@@ -574,7 +574,7 @@
     </changeSet>
 
     <!-- Inserting RMS System Synchronized to payment attribute types table -->
-    <changeSet id="kenyaemr_rms_data_exchange_add_rms_synced_to_payment_attribute_types_20250424_120054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_rms_synced_to_payment_attr_types" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM cashier_payment_attribute_type
@@ -594,7 +594,7 @@
     </changeSet>
 
     <!-- Inserting RMS System Synchronized to person attribute types table -->
-    <changeSet id="kenyaemr_rms_data_exchange_add_rms_synced_to_person_attribute_types_20250424_090054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_rms_synced_to_person_attr_types" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM person_attribute_type
@@ -614,7 +614,7 @@
     </changeSet>
 
     <!-- Inserting Wonder Health System Synchronized to person attribute types table -->
-    <changeSet id="kenyaemr_rms_data_exchange_add_wonder_synced_to_person_attribute_types_20250424_100054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_wonder_synced_to_person_attr_types" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM person_attribute_type
@@ -634,7 +634,7 @@
     </changeSet>
 
     <!-- Inserting RMS System - Patient to rms_queue_system table -->
-    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_patient_20250416_160054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_patient" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM rms_queue_system
@@ -651,7 +651,7 @@
     </changeSet>
 
     <!-- Inserting RMS System - Bill to rms_queue_system table -->
-    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_bill_20250417_150054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_bill" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM rms_queue_system
@@ -668,7 +668,7 @@
     </changeSet>
 
     <!-- Inserting RMS System - Bill Payment to rms_queue_system table -->
-    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_payment_20250417_160054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_rms_system_payment" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM rms_queue_system
@@ -685,7 +685,7 @@
     </changeSet>
 
     <!-- Inserting Wonder Health System - Patient to rms_queue_system table -->
-    <changeSet id="kenyaemr_rms_data_exchange_queue_system_add_wonder_health_system_patient_20250416_161054" author="pwaweru">
+    <changeSet id="kenyaemr_rms_data_exchange_q_sys_wonder_health_system_patient" author="pwaweru">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(*) FROM rms_queue_system
@@ -717,11 +717,11 @@
             <column name="schedulable_class" value="org.openmrs.module.rmsdataexchange.task.PushRMSQueueTask" />
             <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
             <column name="start_time" valueDate="2025-04-01T23:59:59" />
-            <column name="repeat_interval" value="1800" />
+            <column name="repeat_interval" value="1999999999" />
             <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
             <column name="created_by" value="1" />
-            <column name="start_on_startup" value="1" />
-            <column name="started" value="1" />
+            <column name="start_on_startup" value="0" />
+            <column name="started" value="0" />
             <column name="uuid" value="37528f91-1480-4d2e-8731-c97056e109f8" />
         </insert>
     </changeSet>
