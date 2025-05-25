@@ -3,7 +3,7 @@ package org.openmrs.module.rmsdataexchange.api.impl;
 import org.hibernate.SessionFactory;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
-import org.openmrs.module.rmsdataexchange.api.BillAttributeService;
+import org.openmrs.module.rmsdataexchange.api.RMSBillAttributeService;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
-public class BillAttributeServiceImpl extends BaseOpenmrsService implements BillAttributeService {
+public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements RMSBillAttributeService {
 	
 	RmsdataexchangeDao dao;
 	

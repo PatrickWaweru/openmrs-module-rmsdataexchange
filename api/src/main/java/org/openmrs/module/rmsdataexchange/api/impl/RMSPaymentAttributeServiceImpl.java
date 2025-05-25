@@ -1,6 +1,6 @@
 package org.openmrs.module.rmsdataexchange.api.impl;
 
-import org.openmrs.module.rmsdataexchange.api.PaymentAttributeService;
+import org.openmrs.module.rmsdataexchange.api.RMSPaymentAttributeService;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.hibernate.SessionFactory;
 import org.openmrs.api.context.Context;
@@ -13,7 +13,7 @@ import org.openmrs.api.impl.BaseOpenmrsService;
 import java.util.Date;
 import java.util.List;
 
-public class PaymentAttributeServiceImpl extends BaseOpenmrsService implements PaymentAttributeService {
+public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implements RMSPaymentAttributeService {
 	
 	RmsdataexchangeDao dao;
 	

@@ -23,10 +23,10 @@
 		<!-- <require_module version="${metadatadeployVersion}">org.openmrs.module.metadatadeploy</require_module> -->
 		<require_module version="${restWebServicesVersion}">org.openmrs.module.webservices.rest</require_module>
 		<require_module version="${fhir2Version}">org.openmrs.module.fhir2</require_module>
-		<!-- <require_module version="${stockManagementVersion}">org.openmrs.module.stockmanagement</require_module>
+		<require_module version="${stockManagementVersion}">org.openmrs.module.stockmanagement</require_module>
 		<require_module version="${cashierVersion}">
 			org.openmrs.module.kenyaemr.cashier
-		</require_module>		 -->
+		</require_module>		
 	</require_modules>
 
 	<!-- <aware_of_modules>

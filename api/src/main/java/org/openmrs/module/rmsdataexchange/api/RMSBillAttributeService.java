@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Transactional
-public interface BillAttributeService extends OpenmrsService {
+public interface RMSBillAttributeService extends OpenmrsService {
 	
 	// CRUD Operations
 	RMSBillAttribute saveBillAttribute(RMSBillAttribute billAttribute);
