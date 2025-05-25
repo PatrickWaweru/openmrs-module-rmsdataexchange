@@ -42,7 +42,8 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	private SessionFactory sessionFactory;
 	
-	private Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+	// private Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+	// private Boolean debugMode = false;
 	
 	@Override
 	public void setSessionFactory(SessionFactory sessionFactory) {
@@ -57,6 +58,8 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<Payment> getPaymentsByBillId(Integer billId) {
+		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+
 		// Get the current Hibernate session from DbSessionFactory
 		Session session = sessionFactory.getCurrentSession();
         
@@ -96,6 +99,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	@Override
 	public List<RMSQueue> getQueueItems() throws DataException {
+		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Getting all queued items");
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueue.class);
@@ -106,6 +110,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	@Override
 	public RMSQueue saveQueueItem(RMSQueue queue) throws DAOException {
+		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Saving the RMS Queue");
 		sessionFactory.getCurrentSession().saveOrUpdate(queue);
@@ -128,6 +133,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	@Override
 	public RMSQueue removeQueueItem(RMSQueue queue) throws DAOException {
+		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Removing RMS Queue Item");
 		sessionFactory.getCurrentSession().delete(queue);
