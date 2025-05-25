@@ -1,8 +1,8 @@
 package org.openmrs.module.rmsdataexchange.api;
 
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,34 +11,34 @@ import java.util.List;
 public interface BillAttributeService extends OpenmrsService {
 	
 	// CRUD Operations
-	BillAttribute saveBillAttribute(BillAttribute billAttribute);
+	RMSBillAttribute saveBillAttribute(RMSBillAttribute billAttribute);
 	
-	BillAttribute getBillAttribute(Integer billAttributeId);
+	RMSBillAttribute getBillAttribute(Integer billAttributeId);
 	
-	void deleteBillAttribute(BillAttribute billAttribute);
+	void deleteBillAttribute(RMSBillAttribute billAttribute);
 	
 	// Query Operations
-	List<BillAttribute> getBillAttributesByBillId(Integer billId);
+	List<RMSBillAttribute> getBillAttributesByBillId(Integer billId);
 	
-	List<BillAttribute> getBillAttributesByBillUuid(String billUuid);
+	List<RMSBillAttribute> getBillAttributesByBillUuid(String billUuid);
 	
-	List<BillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
+	List<RMSBillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
 	
-	List<BillAttribute> getAllBillAttributes(Boolean includeVoided);
+	List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided);
 	
 	// Type Operations
-	BillAttributeType saveBillAttributeType(BillAttributeType billAttributeType);
+	RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType);
 	
-	BillAttributeType getBillAttributeType(Integer billAttributeTypeId);
+	RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId);
 	
-	List<BillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);
+	List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidBillAttribute(BillAttribute billAttribute, String reason, Integer voidedBy);
+	void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy);
 	
-	void unvoidBillAttribute(BillAttribute billAttribute);
+	void unvoidBillAttribute(RMSBillAttribute billAttribute);
 	
-	void retireBillAttributeType(BillAttributeType billAttributeType, String reason, Integer retiredBy);
+	void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy);
 	
-	void unretireBillAttributeType(BillAttributeType billAttributeType);
+	void unretireBillAttributeType(RMSBillAttributeType billAttributeType);
 }

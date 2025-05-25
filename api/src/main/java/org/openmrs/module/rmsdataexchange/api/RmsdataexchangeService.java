@@ -17,8 +17,8 @@ import org.openmrs.api.OpenmrsService;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.kenyaemr.cashier.api.util.PrivilegeConstants;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.Patient;
 import org.openmrs.Person;
@@ -36,19 +36,19 @@ public interface RmsdataexchangeService extends OpenmrsService {
 	@Transactional(readOnly = true)
 	org.hl7.fhir.r4.model.Patient convertPatientToFhirResource(Patient patient);
 	
-	List<RmsQueue> getQueueItems();
+	List<RMSQueue> getQueueItems();
 	
-	RmsQueue saveQueueItem(RmsQueue queue);
+	RMSQueue saveQueueItem(RMSQueue queue);
 	
-	RmsQueue getQueueItemByUUID(String queueUUID);
+	RMSQueue getQueueItemByUUID(String queueUUID);
 	
-	RmsQueue getQueueItemByID(Integer queueID);
+	RMSQueue getQueueItemByID(Integer queueID);
 	
-	RmsQueue removeQueueItem(RmsQueue queue);
+	RMSQueue removeQueueItem(RMSQueue queue);
 	
-	RmsQueueSystem getQueueSystemByUUID(String queueSystemUUID);
+	RMSQueueSystem getQueueSystemByUUID(String queueSystemUUID);
 	
-	RmsQueueSystem getQueueSystemByID(Integer queueSystemID);
+	RMSQueueSystem getQueueSystemByID(Integer queueSystemID);
 	
 	// Boolean getBillAttribute(Bill bill, String attributeUUID);
 	

@@ -24,12 +24,12 @@ import org.openmrs.api.db.hibernate.DbSessionFactory;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.kenyaemr.cashier.api.model.PaymentMode;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttributeType;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttributeType;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,83 +41,83 @@ public interface RmsdataexchangeDao {
 	
 	Set<Payment> getPaymentsByBillId(Integer billId);
 	
-	List<RmsQueue> getQueueItems();
+	List<RMSQueue> getQueueItems();
 	
-	RmsQueue saveQueueItem(RmsQueue queue);
+	RMSQueue saveQueueItem(RMSQueue queue);
 	
-	RmsQueue getQueueItemByUUID(String queueUUID);
+	RMSQueue getQueueItemByUUID(String queueUUID);
 	
-	RmsQueue getQueueItemByID(Integer queueID);
+	RMSQueue getQueueItemByID(Integer queueID);
 	
-	RmsQueue removeQueueItem(RmsQueue queue);
+	RMSQueue removeQueueItem(RMSQueue queue);
 	
-	RmsQueueSystem getQueueSystemByUUID(String queueSystemUUID);
+	RMSQueueSystem getQueueSystemByUUID(String queueSystemUUID);
 	
-	RmsQueueSystem getQueueSystemByID(Integer queueSystemID);
+	RMSQueueSystem getQueueSystemByID(Integer queueSystemID);
 	
 	// Payment attributes
 	// CRUD Operations
-	PaymentAttribute savePaymentAttribute(PaymentAttribute paymentAttribute);
+	RMSPaymentAttribute savePaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	PaymentAttribute getPaymentAttribute(Integer paymentAttributeId);
+	RMSPaymentAttribute getPaymentAttribute(Integer paymentAttributeId);
 	
-	void deletePaymentAttribute(PaymentAttribute paymentAttribute);
+	void deletePaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	List<PaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid);
+	List<RMSPaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid);
 	
 	// Query Operations
-	List<PaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId);
+	List<RMSPaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId);
 	
-	List<PaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
+	List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
 	
-	List<PaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
+	List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
 	
 	// Type Operations
-	PaymentAttributeType savePaymentAttributeType(PaymentAttributeType paymentAttributeType);
+	RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
-	PaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
+	RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
 	
-	List<PaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
+	List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidPaymentAttribute(PaymentAttribute paymentAttribute, String reason, Integer voidedBy);
+	void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy);
 	
-	void unvoidPaymentAttribute(PaymentAttribute paymentAttribute);
+	void unvoidPaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	void retirePaymentAttributeType(PaymentAttributeType paymentAttributeType, String reason, Integer retiredBy);
+	void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy);
 	
-	void unretirePaymentAttributeType(PaymentAttributeType paymentAttributeType);
+	void unretirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
 	// Bill Attributes
 	// CRUD Operations
-	BillAttribute saveBillAttribute(BillAttribute billAttribute);
+	RMSBillAttribute saveBillAttribute(RMSBillAttribute billAttribute);
 	
-	BillAttribute getBillAttribute(Integer billAttributeId);
+	RMSBillAttribute getBillAttribute(Integer billAttributeId);
 	
-	void deleteBillAttribute(BillAttribute billAttribute);
+	void deleteBillAttribute(RMSBillAttribute billAttribute);
 	
 	// Query Operations
-	List<BillAttribute> getBillAttributesByBillId(Integer billId);
+	List<RMSBillAttribute> getBillAttributesByBillId(Integer billId);
 	
-	List<BillAttribute> getBillAttributesByBillUuid(String billUuid);
+	List<RMSBillAttribute> getBillAttributesByBillUuid(String billUuid);
 	
-	List<BillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
+	List<RMSBillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
 	
-	List<BillAttribute> getAllBillAttributes(Boolean includeVoided);
+	List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided);
 	
 	// Type Operations
-	BillAttributeType saveBillAttributeType(BillAttributeType billAttributeType);
+	RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType);
 	
-	BillAttributeType getBillAttributeType(Integer billAttributeTypeId);
+	RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId);
 	
-	List<BillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);
+	List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidBillAttribute(BillAttribute billAttribute, String reason, Integer voidedBy);
+	void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy);
 	
-	void unvoidBillAttribute(BillAttribute billAttribute);
+	void unvoidBillAttribute(RMSBillAttribute billAttribute);
 	
-	void retireBillAttributeType(BillAttributeType billAttributeType, String reason, Integer retiredBy);
+	void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy);
 	
-	void unretireBillAttributeType(BillAttributeType billAttributeType);
+	void unretireBillAttributeType(RMSBillAttributeType billAttributeType);
 }

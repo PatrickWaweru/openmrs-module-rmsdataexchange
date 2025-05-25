@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class RmsQueueSystem extends BaseOpenmrsData implements Serializable {
+public class RMSQueueSystem extends BaseOpenmrsData implements Serializable {
 	
 	private Integer id;
 	

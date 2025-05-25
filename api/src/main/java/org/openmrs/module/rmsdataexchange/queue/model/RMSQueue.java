@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
-public class RmsQueue extends BaseOpenmrsData implements Serializable {
+public class RMSQueue extends BaseOpenmrsData implements Serializable {
 	
 	private Integer id;
 	
@@ -15,7 +15,7 @@ public class RmsQueue extends BaseOpenmrsData implements Serializable {
 	
 	private Integer retries;
 	
-	private RmsQueueSystem system;
+	private RMSQueueSystem system;
 	
 	public Integer getId() {
 		return id;
@@ -41,11 +41,11 @@ public class RmsQueue extends BaseOpenmrsData implements Serializable {
 		this.retries = retries;
 	}
 	
-	public RmsQueueSystem getSystem() {
+	public RMSQueueSystem getSystem() {
 		return system;
 	}
 	
-	public void setSystem(RmsQueueSystem system) {
+	public void setSystem(RMSQueueSystem system) {
 		this.system = system;
 	}
 	

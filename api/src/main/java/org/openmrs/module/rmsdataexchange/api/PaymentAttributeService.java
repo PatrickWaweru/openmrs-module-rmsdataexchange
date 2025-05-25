@@ -1,8 +1,8 @@
 package org.openmrs.module.rmsdataexchange.api;
 
 import org.openmrs.api.OpenmrsService;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,35 +11,35 @@ import java.util.List;
 public interface PaymentAttributeService extends OpenmrsService {
 	
 	// CRUD Operations
-	PaymentAttribute savePaymentAttribute(PaymentAttribute paymentAttribute);
+	RMSPaymentAttribute savePaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	PaymentAttribute getPaymentAttribute(Integer paymentAttributeId);
+	RMSPaymentAttribute getPaymentAttribute(Integer paymentAttributeId);
 	
-	void deletePaymentAttribute(PaymentAttribute paymentAttribute);
+	void deletePaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	List<PaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid);
+	List<RMSPaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid);
 	
 	// Query Operations
-	List<PaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId);
+	List<RMSPaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId);
 	
-	List<PaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
+	List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
 	
-	List<PaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
+	List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
 	
 	// Type Operations
-	PaymentAttributeType savePaymentAttributeType(PaymentAttributeType paymentAttributeType);
+	RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
-	PaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
+	RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
 	
-	List<PaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
+	List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidPaymentAttribute(PaymentAttribute paymentAttribute, String reason, Integer voidedBy);
+	void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy);
 	
-	void unvoidPaymentAttribute(PaymentAttribute paymentAttribute);
+	void unvoidPaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	void retirePaymentAttributeType(PaymentAttributeType paymentAttributeType, String reason, Integer retiredBy);
+	void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy);
 	
-	void unretirePaymentAttributeType(PaymentAttributeType paymentAttributeType);
+	void unretirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
 }

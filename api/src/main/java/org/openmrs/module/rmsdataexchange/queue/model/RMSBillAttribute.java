@@ -2,15 +2,15 @@ package org.openmrs.module.rmsdataexchange.queue.model;
 
 import java.util.Date;
 
-public class PaymentAttribute {
+public class RMSBillAttribute {
 	
-	private Integer paymentAttributeId;
+	private Integer billAttributeId;
 	
-	private Integer billPaymentId;
+	private Integer billId;
 	
 	private String value;
 	
-	private Integer paymentAttributeTypeId;
+	private Integer billAttributeTypeId;
 	
 	private Integer creator;
 	
@@ -31,34 +31,34 @@ public class PaymentAttribute {
 	private String uuid;
 	
 	// No-arg constructor required by Hibernate
-	public PaymentAttribute() {
+	public RMSBillAttribute() {
 	}
 	
 	// Constructor with required fields
-	public PaymentAttribute(Integer billPaymentId, String value, Integer paymentAttributeTypeId, Integer creator) {
-		this.billPaymentId = billPaymentId;
+	public RMSBillAttribute(Integer billId, String value, Integer billAttributeTypeId, Integer creator) {
+		this.billId = billId;
 		this.value = value;
-		this.paymentAttributeTypeId = paymentAttributeTypeId;
+		this.billAttributeTypeId = billAttributeTypeId;
 		this.creator = creator;
 		this.dateCreated = new Date();
 		this.voided = false;
 	}
 	
 	// Getters and Setters
-	public Integer getPaymentAttributeId() {
-		return paymentAttributeId;
+	public Integer getBillAttributeId() {
+		return billAttributeId;
 	}
 	
-	public void setPaymentAttributeId(Integer paymentAttributeId) {
-		this.paymentAttributeId = paymentAttributeId;
+	public void setBillAttributeId(Integer billAttributeId) {
+		this.billAttributeId = billAttributeId;
 	}
 	
-	public Integer getBillPaymentId() {
-		return billPaymentId;
+	public Integer getBillId() {
+		return billId;
 	}
 	
-	public void setBillPaymentId(Integer billPaymentId) {
-		this.billPaymentId = billPaymentId;
+	public void setBillId(Integer billId) {
+		this.billId = billId;
 	}
 	
 	public String getValue() {
@@ -69,12 +69,12 @@ public class PaymentAttribute {
 		this.value = value;
 	}
 	
-	public Integer getPaymentAttributeTypeId() {
-		return paymentAttributeTypeId;
+	public Integer getBillAttributeTypeId() {
+		return billAttributeTypeId;
 	}
 	
-	public void setPaymentAttributeTypeId(Integer paymentAttributeTypeId) {
-		this.paymentAttributeTypeId = paymentAttributeTypeId;
+	public void setBillAttributeTypeId(Integer billAttributeTypeId) {
+		this.billAttributeTypeId = billAttributeTypeId;
 	}
 	
 	public Integer getCreator() {
@@ -151,10 +151,10 @@ public class PaymentAttribute {
 	
 	@Override
 	public String toString() {
-		return "CashierPaymentAttribute{" + "paymentAttributeId=" + paymentAttributeId + ", billPaymentId=" + billPaymentId
-		        + ", value='" + value + '\'' + ", paymentAttributeTypeId=" + paymentAttributeTypeId + ", creator=" + creator
-		        + ", dateCreated=" + dateCreated + ", changedBy=" + changedBy + ", dateChanged=" + dateChanged + ", voided="
-		        + voided + ", voidedBy=" + voidedBy + ", dateVoided=" + dateVoided + ", voidReason='" + voidReason + '\''
+		return "CashierBillAttribute{" + "billAttributeId=" + billAttributeId + ", billId=" + billId + ", value='" + value
+		        + '\'' + ", billAttributeTypeId=" + billAttributeTypeId + ", creator=" + creator + ", dateCreated="
+		        + dateCreated + ", changedBy=" + changedBy + ", dateChanged=" + dateChanged + ", voided=" + voided
+		        + ", voidedBy=" + voidedBy + ", dateVoided=" + dateVoided + ", voidReason='" + voidReason + '\''
 		        + ", uuid='" + uuid + '\'' + '}';
 	}
 }

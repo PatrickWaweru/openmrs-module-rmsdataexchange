@@ -28,12 +28,12 @@ import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.kenyaemr.cashier.api.model.PaymentMode;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.BillAttributeType;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute;
-import org.openmrs.module.rmsdataexchange.queue.model.PaymentAttributeType;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.hibernate.Criteria;
@@ -95,17 +95,17 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public List<RmsQueue> getQueueItems() throws DataException {
+	public List<RMSQueue> getQueueItems() throws DataException {
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Getting all queued items");
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RmsQueue.class);
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueue.class);
 		criteria.add(Restrictions.eq("voided", false));
 		criteria.addOrder(org.hibernate.criterion.Order.asc("id"));
 		return criteria.list();
 	}
 	
 	@Override
-	public RmsQueue saveQueueItem(RmsQueue queue) throws DAOException {
+	public RMSQueue saveQueueItem(RMSQueue queue) throws DAOException {
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Saving the RMS Queue");
 		sessionFactory.getCurrentSession().saveOrUpdate(queue);
@@ -113,21 +113,21 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public RmsQueue getQueueItemByUUID(String queueUUID) throws DataException {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RmsQueue.class);
+	public RMSQueue getQueueItemByUUID(String queueUUID) throws DataException {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueue.class);
 		criteria.add(Restrictions.eq("uuid", queueUUID));
-		return (RmsQueue) criteria.uniqueResult();
+		return (RMSQueue) criteria.uniqueResult();
 	}
 	
 	@Override
-	public RmsQueue getQueueItemByID(Integer queueID) throws DataException {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RmsQueue.class);
+	public RMSQueue getQueueItemByID(Integer queueID) throws DataException {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueue.class);
 		criteria.add(Restrictions.eq("id", queueID));
-		return (RmsQueue) criteria.uniqueResult();
+		return (RMSQueue) criteria.uniqueResult();
 	}
 	
 	@Override
-	public RmsQueue removeQueueItem(RmsQueue queue) throws DAOException {
+	public RMSQueue removeQueueItem(RMSQueue queue) throws DAOException {
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Removing RMS Queue Item");
 		sessionFactory.getCurrentSession().delete(queue);
@@ -135,82 +135,82 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public RmsQueueSystem getQueueSystemByUUID(String queueSystemUUID) throws DataException {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RmsQueueSystem.class);
+	public RMSQueueSystem getQueueSystemByUUID(String queueSystemUUID) throws DataException {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueueSystem.class);
 		criteria.add(Restrictions.eq("uuid", queueSystemUUID));
-		return (RmsQueueSystem) criteria.uniqueResult();
+		return (RMSQueueSystem) criteria.uniqueResult();
 	}
 	
 	@Override
-	public RmsQueueSystem getQueueSystemByID(Integer queueSystemID) throws DataException {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RmsQueueSystem.class);
+	public RMSQueueSystem getQueueSystemByID(Integer queueSystemID) throws DataException {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSQueueSystem.class);
 		criteria.add(Restrictions.eq("id", queueSystemID));
-		return (RmsQueueSystem) criteria.uniqueResult();
+		return (RMSQueueSystem) criteria.uniqueResult();
 	}
 	
 	// Payment Attributes
 	
 	@Override
-	public PaymentAttribute savePaymentAttribute(PaymentAttribute paymentAttribute) {
+	public RMSPaymentAttribute savePaymentAttribute(RMSPaymentAttribute paymentAttribute) {
 		sessionFactory.getCurrentSession().saveOrUpdate(paymentAttribute);
 		return paymentAttribute;
 	}
 	
 	@Override
-	public PaymentAttribute getPaymentAttribute(Integer paymentAttributeId) {
-		return sessionFactory.getCurrentSession().get(PaymentAttribute.class, paymentAttributeId);
+	public RMSPaymentAttribute getPaymentAttribute(Integer paymentAttributeId) {
+		return sessionFactory.getCurrentSession().get(RMSPaymentAttribute.class, paymentAttributeId);
 	}
 	
 	@Override
-	public void deletePaymentAttribute(PaymentAttribute paymentAttribute) {
+	public void deletePaymentAttribute(RMSPaymentAttribute paymentAttribute) {
 		sessionFactory.getCurrentSession().delete(paymentAttribute);
 	}
 	
 	@Override
-	public List<PaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId) {
+	public List<RMSPaymentAttribute> getPaymentAttributesByPaymentId(Integer paymentId) {
 		return sessionFactory.getCurrentSession()
-		        .createQuery("from PaymentAttribute where billPaymentId = :paymentId", PaymentAttribute.class)
+		        .createQuery("from PaymentAttribute where billPaymentId = :paymentId", RMSPaymentAttribute.class)
 		        .setParameter("paymentId", paymentId).getResultList();
 	}
 	
 	@Override
-	public List<PaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId) {
+	public List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId) {
 		return sessionFactory.getCurrentSession()
-		        .createQuery("from PaymentAttribute where paymentAttributeTypeId = :typeId", PaymentAttribute.class)
+		        .createQuery("from PaymentAttribute where paymentAttributeTypeId = :typeId", RMSPaymentAttribute.class)
 		        .setParameter("typeId", paymentAttributeTypeId).getResultList();
 	}
 	
 	@Override
-	public List<PaymentAttribute> getAllPaymentAttributes(Boolean includeVoided) {
+	public List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided) {
 		String query = "from PaymentAttribute";
 		if (!includeVoided) {
 			query += " where voided = false";
 		}
-		return sessionFactory.getCurrentSession().createQuery(query, PaymentAttribute.class).getResultList();
+		return sessionFactory.getCurrentSession().createQuery(query, RMSPaymentAttribute.class).getResultList();
 	}
 	
 	@Override
-	public PaymentAttributeType savePaymentAttributeType(PaymentAttributeType paymentAttributeType) {
+	public RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType) {
 		sessionFactory.getCurrentSession().saveOrUpdate(paymentAttributeType);
 		return paymentAttributeType;
 	}
 	
 	@Override
-	public PaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
-		return sessionFactory.getCurrentSession().get(PaymentAttributeType.class, paymentAttributeTypeId);
+	public RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
+		return sessionFactory.getCurrentSession().get(RMSPaymentAttributeType.class, paymentAttributeTypeId);
 	}
 	
 	@Override
-	public List<PaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired) {
+	public List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired) {
 		String query = "from PaymentAttributeType";
 		if (!includeRetired) {
 			query += " where retired = false";
 		}
-		return sessionFactory.getCurrentSession().createQuery(query, PaymentAttributeType.class).getResultList();
+		return sessionFactory.getCurrentSession().createQuery(query, RMSPaymentAttributeType.class).getResultList();
 	}
 	
 	@Override
-	public void voidPaymentAttribute(PaymentAttribute paymentAttribute, String reason, Integer voidedBy) {
+	public void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy) {
 		paymentAttribute.setVoided(true);
 		paymentAttribute.setVoidedBy(voidedBy);
 		paymentAttribute.setDateVoided(new Date());
@@ -219,7 +219,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void unvoidPaymentAttribute(PaymentAttribute paymentAttribute) {
+	public void unvoidPaymentAttribute(RMSPaymentAttribute paymentAttribute) {
 		paymentAttribute.setVoided(false);
 		paymentAttribute.setVoidedBy(null);
 		paymentAttribute.setDateVoided(null);
@@ -228,7 +228,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void retirePaymentAttributeType(PaymentAttributeType paymentAttributeType, String reason, Integer retiredBy) {
+	public void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy) {
 		paymentAttributeType.setRetired(true);
 		paymentAttributeType.setRetiredBy(retiredBy);
 		paymentAttributeType.setDateRetired(new Date());
@@ -237,7 +237,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void unretirePaymentAttributeType(PaymentAttributeType paymentAttributeType) {
+	public void unretirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType) {
 		paymentAttributeType.setRetired(false);
 		paymentAttributeType.setRetiredBy(null);
 		paymentAttributeType.setDateRetired(null);
@@ -246,87 +246,87 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public List<PaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid) {
+	public List<RMSPaymentAttribute> getPaymentAttributesByPaymentUuid(String paymentUuid) {
 		return sessionFactory
 		        .getCurrentSession()
 		        .createQuery(
 		            "from PaymentAttribute pa " + "join CashierBillPayment bp on pa.billPaymentId = bp.billPaymentId "
-		                    + "where bp.uuid = :paymentUuid", PaymentAttribute.class)
+		                    + "where bp.uuid = :paymentUuid", RMSPaymentAttribute.class)
 		        .setParameter("paymentUuid", paymentUuid).getResultList();
 	}
 	
 	// Bill Attributes
 	@Override
-	public BillAttribute saveBillAttribute(BillAttribute billAttribute) {
+	public RMSBillAttribute saveBillAttribute(RMSBillAttribute billAttribute) {
 		sessionFactory.getCurrentSession().saveOrUpdate(billAttribute);
 		return billAttribute;
 	}
 	
 	@Override
-	public BillAttribute getBillAttribute(Integer billAttributeId) {
-		return sessionFactory.getCurrentSession().get(BillAttribute.class, billAttributeId);
+	public RMSBillAttribute getBillAttribute(Integer billAttributeId) {
+		return sessionFactory.getCurrentSession().get(RMSBillAttribute.class, billAttributeId);
 	}
 	
 	@Override
-	public void deleteBillAttribute(BillAttribute billAttribute) {
+	public void deleteBillAttribute(RMSBillAttribute billAttribute) {
 		sessionFactory.getCurrentSession().delete(billAttribute);
 	}
 	
 	@Override
-	public List<BillAttribute> getBillAttributesByBillId(Integer billId) {
+	public List<RMSBillAttribute> getBillAttributesByBillId(Integer billId) {
 		return sessionFactory.getCurrentSession()
-		        .createQuery("from CashierBillAttribute where billId = :billId", BillAttribute.class)
+		        .createQuery("from CashierBillAttribute where billId = :billId", RMSBillAttribute.class)
 		        .setParameter("billId", billId).getResultList();
 	}
 	
 	@Override
-	public List<BillAttribute> getBillAttributesByBillUuid(String billUuid) {
+	public List<RMSBillAttribute> getBillAttributesByBillUuid(String billUuid) {
 		return sessionFactory
 		        .getCurrentSession()
 		        .createQuery(
 		            "from CashierBillAttribute ba " + "join CashierBill b on ba.billId = b.billId "
-		                    + "where b.uuid = :billUuid", BillAttribute.class).setParameter("billUuid", billUuid)
+		                    + "where b.uuid = :billUuid", RMSBillAttribute.class).setParameter("billUuid", billUuid)
 		        .getResultList();
 	}
 	
 	@Override
-	public List<BillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId) {
+	public List<RMSBillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId) {
 		return sessionFactory.getCurrentSession()
-		        .createQuery("from CashierBillAttribute where paymentAttributeTypeId = :typeId", BillAttribute.class)
+		        .createQuery("from CashierBillAttribute where paymentAttributeTypeId = :typeId", RMSBillAttribute.class)
 		        .setParameter("typeId", billAttributeTypeId).getResultList();
 	}
 	
 	@Override
-	public List<BillAttribute> getAllBillAttributes(Boolean includeVoided) {
+	public List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided) {
 		String query = "from CashierBillAttribute";
 		if (!includeVoided) {
 			query += " where voided = false";
 		}
-		return sessionFactory.getCurrentSession().createQuery(query, BillAttribute.class).getResultList();
+		return sessionFactory.getCurrentSession().createQuery(query, RMSBillAttribute.class).getResultList();
 	}
 	
 	@Override
-	public BillAttributeType saveBillAttributeType(BillAttributeType billAttributeType) {
+	public RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType) {
 		sessionFactory.getCurrentSession().saveOrUpdate(billAttributeType);
 		return billAttributeType;
 	}
 	
 	@Override
-	public BillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
-		return sessionFactory.getCurrentSession().get(BillAttributeType.class, billAttributeTypeId);
+	public RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
+		return sessionFactory.getCurrentSession().get(RMSBillAttributeType.class, billAttributeTypeId);
 	}
 	
 	@Override
-	public List<BillAttributeType> getAllBillAttributeTypes(Boolean includeRetired) {
+	public List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired) {
 		String query = "from CashierBillAttributeType";
 		if (!includeRetired) {
 			query += " where retired = false";
 		}
-		return sessionFactory.getCurrentSession().createQuery(query, BillAttributeType.class).getResultList();
+		return sessionFactory.getCurrentSession().createQuery(query, RMSBillAttributeType.class).getResultList();
 	}
 	
 	@Override
-	public void voidBillAttribute(BillAttribute billAttribute, String reason, Integer voidedBy) {
+	public void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy) {
 		billAttribute.setVoided(true);
 		billAttribute.setVoidedBy(voidedBy);
 		billAttribute.setDateVoided(new Date());
@@ -335,7 +335,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void unvoidBillAttribute(BillAttribute billAttribute) {
+	public void unvoidBillAttribute(RMSBillAttribute billAttribute) {
 		billAttribute.setVoided(false);
 		billAttribute.setVoidedBy(null);
 		billAttribute.setDateVoided(null);
@@ -344,7 +344,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void retireBillAttributeType(BillAttributeType billAttributeType, String reason, Integer retiredBy) {
+	public void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy) {
 		billAttributeType.setRetired(true);
 		billAttributeType.setRetiredBy(retiredBy);
 		billAttributeType.setDateRetired(new Date());
@@ -353,7 +353,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void unretireBillAttributeType(BillAttributeType billAttributeType) {
+	public void unretireBillAttributeType(RMSBillAttributeType billAttributeType) {
 		billAttributeType.setRetired(false);
 		billAttributeType.setRetiredBy(null);
 		billAttributeType.setDateRetired(null);

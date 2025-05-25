@@ -21,8 +21,8 @@ import org.openmrs.module.fhir2.api.translators.PatientTranslator;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.springframework.transaction.annotation.Transactional;
 import org.openmrs.module.kenyaemr.cashier.api.util.PrivilegeConstants;
 
@@ -72,37 +72,37 @@ public class RmsdataexchangeServiceImpl extends BaseOpenmrsService implements Rm
 	}
 	
 	@Override
-	public List<RmsQueue> getQueueItems() {
+	public List<RMSQueue> getQueueItems() {
 		return (dao.getQueueItems());
 	}
 	
 	@Override
-	public RmsQueue saveQueueItem(RmsQueue queue) {
+	public RMSQueue saveQueueItem(RMSQueue queue) {
 		return (dao.saveQueueItem(queue));
 	}
 	
 	@Override
-	public RmsQueue getQueueItemByUUID(String queueUUID) throws DataException {
+	public RMSQueue getQueueItemByUUID(String queueUUID) throws DataException {
 		return (dao.getQueueItemByUUID(queueUUID));
 	}
 	
 	@Override
-	public RmsQueue getQueueItemByID(Integer queueID) throws DataException {
+	public RMSQueue getQueueItemByID(Integer queueID) throws DataException {
 		return (dao.getQueueItemByID(queueID));
 	}
 	
 	@Override
-	public RmsQueue removeQueueItem(RmsQueue queue) throws DAOException {
+	public RMSQueue removeQueueItem(RMSQueue queue) throws DAOException {
 		return (dao.removeQueueItem(queue));
 	}
 	
 	@Override
-	public RmsQueueSystem getQueueSystemByUUID(String queueSystemUUID) throws DataException {
+	public RMSQueueSystem getQueueSystemByUUID(String queueSystemUUID) throws DataException {
 		return (dao.getQueueSystemByUUID(queueSystemUUID));
 	}
 	
 	@Override
-	public RmsQueueSystem getQueueSystemByID(Integer queueSystemID) throws DataException {
+	public RMSQueueSystem getQueueSystemByID(Integer queueSystemID) throws DataException {
 		return (dao.getQueueSystemByID(queueSystemID));
 	}
 }

@@ -104,7 +104,7 @@ import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Reference;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 
 /**
  * Detects when a new visit has started and syncs patient data to Wonder Health
@@ -682,7 +682,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 						System.err
 						        .println("rmsdataexchange Module: Failed to send patient to Wonder Health. Adding to queue");
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
-					RmsQueueSystem rmsQueueSystem = rmsdataexchangeService
+					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
 					        .getQueueSystemByUUID(RMSModuleConstants.WONDER_HEALTH_SYSTEM_PATIENT);
 					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
 					if (addToQueue) {

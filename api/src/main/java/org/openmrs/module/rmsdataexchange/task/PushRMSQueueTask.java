@@ -7,8 +7,8 @@ import org.openmrs.module.rmsdataexchange.advice.NewPatientRegistrationSyncToWon
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.scheduler.tasks.AbstractTask;
 
 public class PushRMSQueueTask extends AbstractTask {
@@ -22,15 +22,15 @@ public class PushRMSQueueTask extends AbstractTask {
 			System.err.println("rmsdataexchange module: starting the RMS queue processing scheduled task");
 		// Get a list of all queue items
 		RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
-		List<RmsQueue> rmsQueueItems = rmsdataexchangeService.getQueueItems();
+		List<RMSQueue> rmsQueueItems = rmsdataexchangeService.getQueueItems();
 		if (rmsQueueItems != null && rmsQueueItems.size() > 0) {
 			if (debugMode)
 				System.err.println("rmsdataexchange module: Queue Processing: There are some items in the queue");
-			for (RmsQueue item : rmsQueueItems) {
+			for (RMSQueue item : rmsQueueItems) {
 				// Get the payload
 				String payload = item.getPayload();
 				// Get the system used
-				RmsQueueSystem system = item.getSystem();
+				RMSQueueSystem system = item.getSystem();
 				if (system.getUuid() == RMSModuleConstants.RMS_SYSTEM_PATIENT) {
 					// This is a payload for RMS system Patient
 				} else if (system.getUuid() == RMSModuleConstants.RMS_SYSTEM_BILL) {

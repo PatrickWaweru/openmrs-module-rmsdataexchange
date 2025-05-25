@@ -2,7 +2,7 @@ package org.openmrs.module.rmsdataexchange.queue.model;
 
 import java.util.Date;
 
-public class PaymentAttributeType {
+public class RMSPaymentAttributeType {
 	
 	private Integer paymentAttributeTypeId;
 	
@@ -39,11 +39,11 @@ public class PaymentAttributeType {
 	private String uuid;
 	
 	// No-arg constructor required by Hibernate
-	public PaymentAttributeType() {
+	public RMSPaymentAttributeType() {
 	}
 	
 	// Constructor with required fields
-	public PaymentAttributeType(String name, String description, String format, Integer creator, Boolean searchable) {
+	public RMSPaymentAttributeType(String name, String description, String format, Integer creator, Boolean searchable) {
 		this.name = name;
 		this.description = description;
 		this.format = format;

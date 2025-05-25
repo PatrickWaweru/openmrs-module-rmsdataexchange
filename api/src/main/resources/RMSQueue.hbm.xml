@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="org.openmrs.module.rmsdataexchange.queue.model">
 
-    <class name="org.openmrs.module.rmsdataexchange.queue.model.RmsQueue" table="rms_queue">
+    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSQueue" table="rms_queue">
         <id name="id" type="int" column="id" unsaved-value="0">
             <generator class="native" />
         </id>

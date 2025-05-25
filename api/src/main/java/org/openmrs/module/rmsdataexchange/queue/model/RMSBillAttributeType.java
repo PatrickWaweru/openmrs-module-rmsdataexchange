@@ -2,7 +2,7 @@ package org.openmrs.module.rmsdataexchange.queue.model;
 
 import java.util.Date;
 
-public class BillAttributeType {
+public class RMSBillAttributeType {
 	
 	private Integer billAttributeTypeId;
 	
@@ -39,11 +39,11 @@ public class BillAttributeType {
 	private String uuid;
 	
 	// No-arg constructor required by Hibernate
-	public BillAttributeType() {
+	public RMSBillAttributeType() {
 	}
 	
 	// Constructor with required fields
-	public BillAttributeType(String name, String description, String format, Integer creator, Boolean searchable) {
+	public RMSBillAttributeType(String name, String description, String format, Integer creator, Boolean searchable) {
 		this.name = name;
 		this.description = description;
 		this.format = format;

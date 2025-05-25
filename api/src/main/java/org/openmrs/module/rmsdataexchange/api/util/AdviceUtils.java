@@ -9,8 +9,8 @@ import org.openmrs.GlobalProperty;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueue;
-import org.openmrs.module.rmsdataexchange.queue.model.RmsQueueSystem;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AdviceUtils {
@@ -258,7 +258,7 @@ public class AdviceUtils {
 	 * @param payload
 	 * @return
 	 */
-	public static Boolean addSyncPayloadToQueue(String payload, RmsQueueSystem rmsQueueSystem) {
+	public static Boolean addSyncPayloadToQueue(String payload, RMSQueueSystem rmsQueueSystem) {
 		Boolean ret = false;
 		Boolean debugMode = isRMSLoggingEnabled();
 		try {
@@ -266,7 +266,7 @@ public class AdviceUtils {
 			RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
 			if (rmsdataexchangeService != null) {
 				if (rmsQueueSystem != null) {
-					RmsQueue rmsQueue = new RmsQueue();
+					RMSQueue rmsQueue = new RMSQueue();
 					rmsQueue.setPayload(payload);
 					rmsQueue.setSystem(rmsQueueSystem);
 					

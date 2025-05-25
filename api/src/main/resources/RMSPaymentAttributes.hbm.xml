@@ -4,7 +4,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="org.openmrs.module.rmsdataexchange.queue.model">
-    <class name="org.openmrs.module.rmsdataexchange.queue.model.PaymentAttribute" table="cashier_payment_attribute">
+    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute" table="cashier_payment_attribute">
         <id name="paymentAttributeId" type="java.lang.Integer">
             <column name="payment_attribute_id" />
             <generator class="native" />
