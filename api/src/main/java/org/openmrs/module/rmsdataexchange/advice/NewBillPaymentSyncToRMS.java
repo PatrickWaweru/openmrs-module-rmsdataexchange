@@ -188,18 +188,28 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		
 		return (ret);
 	}
+
+	/**
+	 * Send the new payment payload to RMS
+	 * 
+	 * @param Payment payment
+	 * @return
+	 */
+	public static Boolean sendRMSNewPayment(@NotNull Payment payment) {
+		return sendRMSNewPayment(prepareBillPaymentRMSPayload(payment));
+	}
 	
 	/**
 	 * Send the new payment payload to RMS
 	 * 
-	 * @param patient
+	 * @param String payment
 	 * @return
 	 */
-	public static Boolean sendRMSNewPayment(@NotNull Payment payment) {
+	public static Boolean sendRMSNewPayment(@NotNull String payment) {
 		Boolean ret = false;
 		Boolean debugMode = false;
 		
-		String payload = prepareBillPaymentRMSPayload(payment);
+		String payload = payment;
 		
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;

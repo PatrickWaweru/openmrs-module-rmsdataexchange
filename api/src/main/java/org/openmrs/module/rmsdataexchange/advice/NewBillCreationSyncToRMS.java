@@ -139,16 +139,26 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		}
 		return itemCategory.getFullySpecifiedName(Locale.ENGLISH).getName();
 	}
+
+	/**
+	 * Send the new bill payload to RMS
+	 * 
+	 * @param Bill bill
+	 * @return
+	 */
+	public static Boolean sendRMSNewBill(@NotNull Bill bill) {
+		return sendRMSNewBill(prepareNewBillRMSPayload(bill));
+	}
 	
 	/**
 	 * Send the new bill payload to RMS
 	 * 
-	 * @param patient
+	 * @param String bill
 	 * @return
 	 */
-	public static Boolean sendRMSNewBill(@NotNull Bill bill) {
+	public static Boolean sendRMSNewBill(@NotNull String bill) {
 		Boolean ret = false;
-		String payload = prepareNewBillRMSPayload(bill);
+		String payload = bill;
 		Boolean debugMode = false;
 		
 		HttpsURLConnection con = null;

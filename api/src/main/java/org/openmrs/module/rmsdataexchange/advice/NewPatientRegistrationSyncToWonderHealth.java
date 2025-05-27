@@ -45,6 +45,8 @@ import org.openmrs.PersonName;
 import org.openmrs.Relationship;
 import org.openmrs.RelationshipType;
 import org.openmrs.Visit;
+import org.openmrs.VisitAttributeType;
+import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.fhir2.FhirConstants;
 import org.openmrs.module.fhir2.api.translators.LocationTranslator;
@@ -94,56 +96,70 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (AdviceUtils.isWonderHealthIntegrationEnabled()) {
 				// Check if the method is "saveVisit"
-				if (debugMode)
-					System.out.println("rmsdataexchange Module: Wonder Health: Method: " + method.getName());
+				// if (debugMode)
+				// 	System.out.println("rmsdataexchange Module: Wonder Health: Method: " + method.getName());
 				
 				if (method.getName().equals("saveVisit") && args.length > 0 && args[0] instanceof Visit) {
 					
-					for (Object object : args) {
-						if (debugMode)
-							System.out.println("rmsdataexchange Module: Wonder Health: Object Type: "
-							        + object.getClass().getName());
-					}
+					// for (Object object : args) {
+					// 	if (debugMode)
+					// 		System.out.println("rmsdataexchange Module: Wonder Health: Object Type: "
+					// 		        + object.getClass().getName());
+					// }
 					
 					Visit visit = (Visit) args[0];
 					
 					// check visit info and only process new visits
 					if (visit != null && visit.getStopDatetime() == null) {
+						// Check if visit is already being/been processed 
+						String syncCheck = Context.getAuthenticatedUser().getUserProperty("visit-" + visit.getUuid());
 						if (debugMode)
-							System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
-						if (debugMode)
-							System.out.println("rmsdataexchange Module: Visit UUID: " + visit.getUuid());
-						if (debugMode)
-							System.out.println("rmsdataexchange Module: Visit Date Changed: " + visit.getDateChanged());
-						Patient patient = visit.getPatient();
-						
-						if (patient != null) {
-							// Check if male or female
-							if (patient.getGender().equalsIgnoreCase("F") || patient.getAge() <= 6) {
-								if (debugMode)
-									System.out.println("rmsdataexchange Module: New patient checked in");
-								if (debugMode)
-									System.out.println("rmsdataexchange Module: Patient Name: "
-									        + patient.getPersonName().getFullName());
-								if (debugMode)
-									System.out.println("rmsdataexchange Module: Patient DOB: " + patient.getBirthdate());
-								if (debugMode)
-									System.out.println("rmsdataexchange Module: Patient Age: " + patient.getAge());
-								
-								String payload = preparePatientPayload(patient);
-								// Use a thread to send the data. This frees up the frontend to proceed
-								syncPatientRunnable runner = new syncPatientRunnable(payload);
-								Thread thread = new Thread(runner);
-								thread.start();
+							System.out.println("rmsdataexchange Module: Wonder Health: Sync check is: " + syncCheck);
+						if (syncCheck == null || syncCheck == "0" || syncCheck.isEmpty()
+						        || syncCheck.trim().equalsIgnoreCase("")) {
+							if (debugMode)
+								System.out
+								        .println("rmsdataexchange Module: Wonder Health: Visit not processed yet. Now processing");
+							Context.getAuthenticatedUser().setUserProperty("visit-" + visit.getUuid(), "1");
+							if (debugMode)
+								System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
+							if (debugMode)
+								System.out.println("rmsdataexchange Module: Visit UUID: " + visit.getUuid());
+							if (debugMode)
+								System.out.println("rmsdataexchange Module: Visit Date Changed: " + visit.getDateChanged());
+							Patient patient = visit.getPatient();
+							
+							if (patient != null) {
+								// Check if male or female
+								if (patient.getGender().equalsIgnoreCase("F") || patient.getAge() <= 6) {
+									if (debugMode)
+										System.out.println("rmsdataexchange Module: New patient checked in");
+									if (debugMode)
+										System.out.println("rmsdataexchange Module: Patient Name: "
+										        + patient.getPersonName().getFullName());
+									if (debugMode)
+										System.out.println("rmsdataexchange Module: Patient DOB: " + patient.getBirthdate());
+									if (debugMode)
+										System.out.println("rmsdataexchange Module: Patient Age: " + patient.getAge());
+									
+									String payload = preparePatientPayload(patient);
+									// Use a thread to send the data. This frees up the frontend to proceed
+									syncPatientRunnable runner = new syncPatientRunnable(payload);
+									Thread thread = new Thread(runner);
+									thread.start();
+								} else {
+									if (debugMode)
+										System.out
+										        .println("rmsdataexchange Module: Wonder Health: The patient is not female and not below 7 years old");
+								}
 							} else {
 								if (debugMode)
 									System.out
-									        .println("rmsdataexchange Module: Wonder Health: The patient is not female and not below 7 years old");
+									        .println("rmsdataexchange Module: Wonder Health: Error: No patient attached to the visit");
 							}
 						} else {
 							if (debugMode)
-								System.out
-								        .println("rmsdataexchange Module: Wonder Health: Error: No patient attached to the visit");
+								System.out.println("rmsdataexchange Module: Wonder Health: Error: Visit already processed");
 						}
 						
 					} else {
@@ -438,7 +454,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 	 * @param patient
 	 * @return
 	 */
-	public Boolean sendWonderHealthPatientRegistration(@NotNull String patient) {
+	public static Boolean sendWonderHealthPatientRegistration(@NotNull String patient) {
 		Boolean ret = false;
 		String payload = patient;
 		Boolean debugMode = false;

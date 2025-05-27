@@ -60,6 +60,8 @@ public class RMSModuleConstants {
 	
 	public static final String PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID = "8f1d38cc-8d52-4513-bd8a-b14272cfac2d";
 	
+	public static final String VISIT_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID = "99aed12b-d502-41c3-94cb-b5dcaa7fad1b";
+	
 	public static final String BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID = "78a8fdd0-42fa-4a21-924f-3d035b4cc0bb";
 	
 	public static final String PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID = "b442d94b-2a48-4d69-b47e-80049e8e0735";

@@ -5,7 +5,7 @@
 
 <hibernate-mapping package="org.openmrs.module.rmsdataexchange.queue.model">
     
-    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute" table="cashier_bill_attribute" dynamic-update="true" dynamic-insert="true">
+    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute" table="rms_bill_attribute" dynamic-update="true" dynamic-insert="true">
         
         <id name="billAttributeId" column="bill_attribute_id">
             <generator class="native"/>

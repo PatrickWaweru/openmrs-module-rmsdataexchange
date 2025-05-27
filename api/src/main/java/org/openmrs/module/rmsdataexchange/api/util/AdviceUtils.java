@@ -1,11 +1,16 @@
 package org.openmrs.module.rmsdataexchange.api.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
+import org.openmrs.Visit;
+import org.openmrs.VisitAttribute;
+import org.openmrs.VisitAttributeType;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
@@ -323,6 +328,80 @@ public class AdviceUtils {
 		}
 		
 		return (ret);
+	}
+	
+	/**
+	 * Print the current date and time
+	 * 
+	 * @return
+	 */
+	public static String printCurrentDateTime() {
+		// Get the current date and time
+		LocalDateTime currentDateTime = LocalDateTime.now();
+		
+		// Format the date and time for better readability
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+		String formattedDateTime = currentDateTime.format(formatter);
+		
+		return (formattedDateTime);
+	}
+	
+	/**
+	 * Get the value of visit attribute
+	 * 
+	 * @param visit
+	 * @param attributeTypeUuid
+	 * @return
+	 */
+	public static String getVisitAttributeValueByTypeUuid(Visit visit, String attributeTypeUuid) {
+		if (visit == null || attributeTypeUuid == null) {
+			return null;
+		}
+		
+		for (VisitAttribute attribute : visit.getActiveAttributes()) {
+			VisitAttributeType type = attribute.getAttributeType();
+			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
+				return attribute.getValueReference();
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Set visit attribute
+	 * 
+	 * @param visit
+	 * @param attributeTypeUuid
+	 * @param value
+	 */
+	public static void setVisitAttributeValueByTypeUuid(Visit visit, String attributeTypeUuid, Object value) {
+		if (visit == null || attributeTypeUuid == null || value == null) {
+			return;
+		}
+		
+		VisitAttributeType attributeType = Context.getVisitService().getVisitAttributeTypeByUuid(attributeTypeUuid);
+		if (attributeType == null) {
+			throw new IllegalArgumentException("No VisitAttributeType found for UUID: " + attributeTypeUuid);
+		}
+		
+		VisitAttribute existingAttribute = null;
+		
+		for (VisitAttribute attr : visit.getAttributes()) {
+			if (attributeType.equals(attr.getAttributeType())) {
+				existingAttribute = attr;
+				break;
+			}
+		}
+		
+		if (existingAttribute != null) {
+			existingAttribute.setValue(value); // updates existing
+		} else {
+			VisitAttribute newAttribute = new VisitAttribute();
+			newAttribute.setAttributeType(attributeType);
+			newAttribute.setValue(value);
+			visit.addAttribute(newAttribute); // inserts new
+		}
 	}
 	
 	/**

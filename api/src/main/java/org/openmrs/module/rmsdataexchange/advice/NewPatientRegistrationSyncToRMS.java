@@ -59,7 +59,8 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 								System.out.println("rmsdataexchange Module: Age: " + patient.getAge());
 							
 							// Use a thread to send the data. This frees up the frontend to proceed
-							syncPatientRunnable runner = new syncPatientRunnable(patient);
+							String payload = preparePatientRMSPayload(patient);
+							syncPatientRunnable runner = new syncPatientRunnable(payload);
 							Thread thread = new Thread(runner);
 							thread.start();
 						} else {
@@ -139,16 +140,26 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		
 		return (ret);
 	}
+
+	/**
+	 * Send the patient registration payload to RMS
+	 * 
+	 * @param Patient patient
+	 * @return
+	 */
+	public static Boolean sendRMSPatientRegistration(@NotNull Patient patient) {
+		return(sendRMSPatientRegistration(preparePatientRMSPayload(patient)));
+	}
 	
 	/**
 	 * Send the patient registration payload to RMS
 	 * 
-	 * @param patient
+	 * @param String patient
 	 * @return
 	 */
-	public static Boolean sendRMSPatientRegistration(@NotNull Patient patient) {
+	public static Boolean sendRMSPatientRegistration(@NotNull String patient) {
 		Boolean ret = false;
-		String payload = preparePatientRMSPayload(patient);
+		String payload = patient;
 		Boolean debugMode = false;
 		
 		HttpsURLConnection con = null;
@@ -388,11 +399,11 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 	 */
 	private class syncPatientRunnable implements Runnable {
 		
-		Patient patient = new Patient();
+		String patient = "";
 		
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		
-		public syncPatientRunnable(@NotNull Patient patient) {
+		public syncPatientRunnable(@NotNull String patient) {
 			this.patient = patient;
 		}
 		

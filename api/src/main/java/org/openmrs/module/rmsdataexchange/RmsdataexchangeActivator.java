@@ -12,6 +12,8 @@ package org.openmrs.module.rmsdataexchange;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -27,7 +29,7 @@ public class RmsdataexchangeActivator extends BaseModuleActivator {
 	 */
 	public void started() {
 		log.info("Started rmsdataexchange Module");
-		System.err.println("rmsdataexchange Module Started: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module Started: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	/**
@@ -35,43 +37,32 @@ public class RmsdataexchangeActivator extends BaseModuleActivator {
 	 */
 	public void shutdown() {
 		log.info("Shutdown smsdataexchange Module");
-		System.err.println("rmsdataexchange Module Shutdown: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module Shutdown: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void stopped() {
-		System.err.println("rmsdataexchange Module stopped: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module stopped: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void willRefreshContext() {
-		System.err.println("rmsdataexchange Module refreshing context: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module refreshing context: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void willStart() {
-		System.err.println("rmsdataexchange Module starting: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module starting: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void willStop() {
-		System.err.println("rmsdataexchange Module stopping: " + printCurrentDateTime());
+		System.err.println("rmsdataexchange Module stopping: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void contextRefreshed() {
-		System.err.println("rmsdataexchange finished refreshing context: " + printCurrentDateTime());
-	}
-	
-	public static String printCurrentDateTime() {
-		// Get the current date and time
-		LocalDateTime currentDateTime = LocalDateTime.now();
-		
-		// Format the date and time for better readability
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-		String formattedDateTime = currentDateTime.format(formatter);
-		
-		return (formattedDateTime);
+		System.err.println("rmsdataexchange finished refreshing context: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 }
