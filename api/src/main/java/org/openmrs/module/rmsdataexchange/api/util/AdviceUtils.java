@@ -8,6 +8,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openmrs.GlobalProperty;
+import org.openmrs.Person;
+import org.openmrs.PersonAttribute;
+import org.openmrs.PersonAttributeType;
 import org.openmrs.Visit;
 import org.openmrs.VisitAttribute;
 import org.openmrs.VisitAttributeType;
@@ -401,6 +404,64 @@ public class AdviceUtils {
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
 			visit.addAttribute(newAttribute); // inserts new
+		}
+	}
+
+	/**
+	 * Get the value of person attribute
+	 * 
+	 * @param person
+	 * @param attributeTypeUuid
+	 * @return
+	 */
+	public static String getPersonAttributeValueByTypeUuid(Person person, String attributeTypeUuid) {
+		if (person == null || attributeTypeUuid == null) {
+			return null;
+		}
+		
+		for (PersonAttribute attribute : person.getActiveAttributes()) {
+			PersonAttributeType type = attribute.getAttributeType();
+			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
+				return attribute.getValue();
+			}
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Set Person attribute
+	 * 
+	 * @param Person
+	 * @param attributeTypeUuid
+	 * @param value
+	 */
+	public static void setPersonAttributeValueByTypeUuid(Person person, String attributeTypeUuid, String value) {
+		if (person == null || attributeTypeUuid == null || value == null) {
+			return;
+		}
+		
+		PersonAttributeType attributeType = Context.getPersonService().getPersonAttributeTypeByUuid(attributeTypeUuid);
+		if (attributeType == null) {
+			throw new IllegalArgumentException("No PersonAttributeType found for UUID: " + attributeTypeUuid);
+		}
+		
+		PersonAttribute existingAttribute = null;
+		
+		for (PersonAttribute attr : person.getAttributes()) {
+			if (attributeType.equals(attr.getAttributeType())) {
+				existingAttribute = attr;
+				break;
+			}
+		}
+		
+		if (existingAttribute != null) {
+			existingAttribute.setValue(value); // updates existing
+		} else {
+			PersonAttribute newAttribute = new PersonAttribute();
+			newAttribute.setAttributeType(attributeType);
+			newAttribute.setValue(value);
+			person.addAttribute(newAttribute); // inserts new
 		}
 	}
 	

@@ -19,9 +19,12 @@ import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
+import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
 import org.openmrs.module.kenyaemr.cashier.util.Utils;
 import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.aop.AfterReturningAdvice;
 
@@ -43,30 +46,40 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 					
 					// Log patient info
 					if (patient != null) {
-						Date patientCreationDate = patient.getDateCreated();
-						if (debugMode)
-							System.out.println("rmsdataexchange Module: patient was created on: " + patientCreationDate);
-						
-						if (patientCreationDate != null && AdviceUtils.checkIfCreateModetOrEditMode(patientCreationDate)) {
-							// CREATE MODE
+
+						// Check if the patient has already been synced (using patient attribute)
+						String attrCheck = AdviceUtils.getPersonAttributeValueByTypeUuid(patient, RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
+						if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+						        	|| attrCheck.trim().equalsIgnoreCase("")) {
+							Date patientCreationDate = patient.getDateCreated();
+							System.out.println("rmsdataexchange Module: RMS Patient Date Changed: " + patient.getDateChanged());
 							if (debugMode)
-								System.out.println("rmsdataexchange Module: New patient registered:");
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: Name: " + patient.getPersonName().getFullName());
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: DOB: " + patient.getBirthdate());
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: Age: " + patient.getAge());
+								System.out.println("rmsdataexchange Module: patient was created on: " + patientCreationDate);
 							
-							// Use a thread to send the data. This frees up the frontend to proceed
-							String payload = preparePatientRMSPayload(patient);
-							syncPatientRunnable runner = new syncPatientRunnable(payload);
-							Thread thread = new Thread(runner);
-							thread.start();
+							if (patientCreationDate != null && AdviceUtils.checkIfCreateModetOrEditMode(patientCreationDate)) {
+								// CREATE MODE
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: New patient registered:");
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: Name: " + patient.getPersonName().getFullName());
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: DOB: " + patient.getBirthdate());
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: Age: " + patient.getAge());
+								
+								// Use a thread to send the data. This frees up the frontend to proceed
+								String payload = preparePatientRMSPayload(patient);
+								syncPatientRunnable runner = new syncPatientRunnable(payload, patient);
+								Thread thread = new Thread(runner);
+								thread.start();
+							} else {
+								// EDIT MODE
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: patient in edit mode. we ignore");
+							}
 						} else {
-							// EDIT MODE
 							if (debugMode)
-								System.out.println("rmsdataexchange Module: patient in edit mode. we ignore");
+								System.out.println("rmsdataexchange Module: RMS: Error: Patient already sent to remote");
 						}
 					} else {
 						if (debugMode)
@@ -399,11 +412,13 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 	 */
 	private class syncPatientRunnable implements Runnable {
 		
-		String patient = "";
+		String payload = "";
+		Patient patient = null;
 		
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		
-		public syncPatientRunnable(@NotNull String patient) {
+		public syncPatientRunnable(@NotNull String payload, @NotNull Patient patient) {
+			this.payload = payload;
 			this.patient = patient;
 		}
 		
@@ -427,14 +442,33 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 					Thread.currentThread().interrupt();
 				}
 				
-				Boolean testPatientSending = sendRMSPatientRegistration(patient);
+				Boolean testPatientSending = sendRMSPatientRegistration(payload);
 				
 				if (testPatientSending) {
+					// Mark NOT sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient, RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+					Context.getPatientService().savePatient(patient);
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Finished sending patient to RMS");
+					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
+					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
+					        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_PATIENT);
+					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
+					if (addToQueue) {
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+					} else {
+						if (debugMode)
+							System.err
+							        .println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+					}
 				} else {
+					// Success sending the patient
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
+					// Mark sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient, RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
+					Context.getPatientService().savePatient(patient);
 				}
 			}
 			catch (Exception ex) {

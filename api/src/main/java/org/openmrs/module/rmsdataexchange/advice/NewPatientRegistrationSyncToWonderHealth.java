@@ -111,51 +111,62 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 					
 					// check visit info and only process new visits
 					if (visit != null && visit.getStopDatetime() == null) {
-						// Check if visit is already being/been processed 
+						// Check if visit is already being/been processed (using user property) NB: When checking in a patient, a strange thing happens
+						// If you select to add to the queue, the method "saveVisit" is called twice. This fixes the anomourous behavior
 						String syncCheck = Context.getAuthenticatedUser().getUserProperty("visit-" + visit.getUuid());
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Wonder Health: Sync check is: " + syncCheck);
+
 						if (syncCheck == null || syncCheck == "0" || syncCheck.isEmpty()
 						        || syncCheck.trim().equalsIgnoreCase("")) {
 							if (debugMode)
 								System.out
 								        .println("rmsdataexchange Module: Wonder Health: Visit not processed yet. Now processing");
 							Context.getAuthenticatedUser().setUserProperty("visit-" + visit.getUuid(), "1");
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: Visit UUID: " + visit.getUuid());
-							if (debugMode)
-								System.out.println("rmsdataexchange Module: Visit Date Changed: " + visit.getDateChanged());
-							Patient patient = visit.getPatient();
-							
-							if (patient != null) {
-								// Check if male or female
-								if (patient.getGender().equalsIgnoreCase("F") || patient.getAge() <= 6) {
-									if (debugMode)
-										System.out.println("rmsdataexchange Module: New patient checked in");
-									if (debugMode)
-										System.out.println("rmsdataexchange Module: Patient Name: "
-										        + patient.getPersonName().getFullName());
-									if (debugMode)
-										System.out.println("rmsdataexchange Module: Patient DOB: " + patient.getBirthdate());
-									if (debugMode)
-										System.out.println("rmsdataexchange Module: Patient Age: " + patient.getAge());
-									
-									String payload = preparePatientPayload(patient);
-									// Use a thread to send the data. This frees up the frontend to proceed
-									syncPatientRunnable runner = new syncPatientRunnable(payload);
-									Thread thread = new Thread(runner);
-									thread.start();
+
+							// Check if the patient has already been synced (using patient attribute)
+							String attrCheck = AdviceUtils.getPersonAttributeValueByTypeUuid(visit.getPatient(), RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID);
+							if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+						        	|| attrCheck.trim().equalsIgnoreCase("")) {
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: Visit UUID: " + visit.getUuid());
+								if (debugMode)
+									System.out.println("rmsdataexchange Module: Visit Date Changed: " + visit.getDateChanged());
+								Patient patient = visit.getPatient();
+								
+								if (patient != null) {
+									// Check if male or female
+									if (patient.getGender().equalsIgnoreCase("F") || patient.getAge() <= 6) {
+										if (debugMode)
+											System.out.println("rmsdataexchange Module: New patient checked in");
+										if (debugMode)
+											System.out.println("rmsdataexchange Module: Patient Name: "
+													+ patient.getPersonName().getFullName());
+										if (debugMode)
+											System.out.println("rmsdataexchange Module: Patient DOB: " + patient.getBirthdate());
+										if (debugMode)
+											System.out.println("rmsdataexchange Module: Patient Age: " + patient.getAge());
+										
+										String payload = preparePatientPayload(patient);
+										// Use a thread to send the data. This frees up the frontend to proceed
+										syncPatientRunnable runner = new syncPatientRunnable(payload, patient);
+										Thread thread = new Thread(runner);
+										thread.start();
+									} else {
+										if (debugMode)
+											System.out
+													.println("rmsdataexchange Module: Wonder Health: The patient is not female and not below 7 years old");
+									}
 								} else {
 									if (debugMode)
 										System.out
-										        .println("rmsdataexchange Module: Wonder Health: The patient is not female and not below 7 years old");
+												.println("rmsdataexchange Module: Wonder Health: Error: No patient attached to the visit");
 								}
 							} else {
 								if (debugMode)
-									System.out
-									        .println("rmsdataexchange Module: Wonder Health: Error: No patient attached to the visit");
+									System.out.println("rmsdataexchange Module: Wonder Health: Error: Patient already sent to remote");
 							}
 						} else {
 							if (debugMode)
@@ -630,11 +641,13 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 	private class syncPatientRunnable implements Runnable {
 		
 		String payload = "";
+		Patient patient = null;
 		
 		Boolean debugMode = false;
 		
-		public syncPatientRunnable(@NotNull String payload) {
+		public syncPatientRunnable(@NotNull String payload, @NotNull Patient patient) {
 			this.payload = payload;
+			this.patient = patient;
 		}
 		
 		@Override
@@ -663,6 +676,9 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 				
 				Boolean sendWonderHealthResult = sendWonderHealthPatientRegistration(payload);
 				if (sendWonderHealthResult == false) {
+					// Mark NOT sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient, RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "0");
+					Context.getPatientService().savePatient(patient);
 					// Failed to send the payload. We put it in the queue
 					if (debugMode)
 						System.err
@@ -680,8 +696,12 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 							        .println("rmsdataexchange Module: Error: Failed to add patient to Wonder Health Queue");
 					}
 				} else {
+					// Success sending the patient
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Finished sending patient to Wonder Health");
+					// Mark sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient, RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "1");
+					Context.getPatientService().savePatient(patient);
 				}
 				
 			}
