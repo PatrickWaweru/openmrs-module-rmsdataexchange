@@ -30,7 +30,7 @@ public class PushRMSQueueTask extends AbstractTask {
 				// Get the payload
 				String payload = item.getPayload();
 				// Get the system used
-				RMSQueueSystem system = item.getSystem();
+				RMSQueueSystem system = item.getRmsSystem();
 				if (system.getUuid() == RMSModuleConstants.RMS_SYSTEM_PATIENT) {
 					// This is a payload for RMS system Patient
 				} else if (system.getUuid() == RMSModuleConstants.RMS_SYSTEM_BILL) {

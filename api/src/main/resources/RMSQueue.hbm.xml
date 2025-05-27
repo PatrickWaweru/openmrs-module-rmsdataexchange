@@ -11,7 +11,7 @@
         </id>
         <discriminator column="id" insert="false" />
         <property name="payload" type ="java.lang.String" column ="payload" length="65535"/>
-        <property name="system" type="java.lang.Integer" column="system"/>
+        <many-to-one name="rmsSystem" class="org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem" column="rms_system" not-null="true"/>
         <property name="retries" type="java.lang.Integer" column="retries"/>
         <property name="uuid" type="java.lang.String" column="uuid" length="38" unique="true" />
         <!-- bi-directional many-to-one association to User -->

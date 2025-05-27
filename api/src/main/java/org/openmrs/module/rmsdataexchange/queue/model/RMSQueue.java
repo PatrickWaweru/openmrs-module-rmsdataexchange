@@ -1,11 +1,8 @@
 package org.openmrs.module.rmsdataexchange.queue.model;
 
-import org.openmrs.BaseOpenmrsData;
-import org.openmrs.Order;
-
 import java.io.Serializable;
-import java.util.Date;
-import java.util.UUID;
+
+import org.openmrs.BaseOpenmrsData;
 
 public class RMSQueue extends BaseOpenmrsData implements Serializable {
 	
@@ -15,7 +12,7 @@ public class RMSQueue extends BaseOpenmrsData implements Serializable {
 	
 	private Integer retries;
 	
-	private RMSQueueSystem system;
+	private RMSQueueSystem rmsSystem;
 	
 	public Integer getId() {
 		return id;
@@ -41,18 +38,22 @@ public class RMSQueue extends BaseOpenmrsData implements Serializable {
 		this.retries = retries;
 	}
 	
-	public RMSQueueSystem getSystem() {
-		return system;
+	public RMSQueueSystem getRmsSystem() {
+		return rmsSystem;
 	}
 	
-	public void setSystem(RMSQueueSystem system) {
-		this.system = system;
+	public void setRmsSystem(RMSQueueSystem rmsSystem) {
+		this.rmsSystem = rmsSystem;
 	}
 	
 	@Override
 	public String toString() {
-		return "RmsQueue{" + "id=" + id + ", payload='" + payload + '\'' + ", retries=" + retries + ", system=" + system
-		        + '}';
+		return "RMSQueue [id=" + id + ", payload=" + payload + ", retries=" + retries + ", system=" + rmsSystem
+		        + ", creator=" + creator + ", getId()=" + getId() + ", getPayload()=" + getPayload() + ", getRetries()="
+		        + getRetries() + ", getChangedBy()=" + getChangedBy() + ", getCreator()=" + getCreator()
+		        + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated() + ", getDateVoided()="
+		        + getDateVoided() + ", getVoidReason()=" + getVoidReason() + ", getVoided()=" + getVoided()
+		        + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
 	}
 	
 }

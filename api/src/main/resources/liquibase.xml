@@ -34,6 +34,7 @@
             <column defaultValueBoolean="false" name="voided" type="boolean">
                 <constraints nullable="true"/>
             </column>
+            <column name="voided_by" type="int"/>
             <column name="date_voided" type="datetime"/>
             <column name="voided_reason" type="varchar(255)"/>
             <column name="uuid" type="char(38)">
@@ -58,11 +59,11 @@
             <column name="id" autoIncrement="true" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="system" type="int">
+            <column name="rms_system" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="reties" type="int">
-                <constraints nullable="false"/>
+            <column name="retries" type="int" defaultValue="0">
+                <constraints nullable="true"/>
             </column>
             <column name="payload" type="varchar(16000)">
                 <constraints nullable="false"/>
@@ -83,7 +84,7 @@
                 <constraints nullable="false" unique="true"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="rms_queue" baseColumnNames="id"
+        <addForeignKeyConstraint baseTableName="rms_queue" baseColumnNames="rms_system"
                                  constraintName="rms_queue_system_reference"
                                  referencedTableName="rms_queue_system"
                                  referencedColumnNames="id"

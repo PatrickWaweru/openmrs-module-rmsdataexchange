@@ -36,18 +36,25 @@ public interface RmsdataexchangeService extends OpenmrsService {
 	@Transactional(readOnly = true)
 	org.hl7.fhir.r4.model.Patient convertPatientToFhirResource(Patient patient);
 	
+	@Transactional(readOnly = true)
 	List<RMSQueue> getQueueItems();
 	
+	@Transactional
 	RMSQueue saveQueueItem(RMSQueue queue);
 	
+	@Transactional(readOnly = true)
 	RMSQueue getQueueItemByUUID(String queueUUID);
 	
+	@Transactional(readOnly = true)
 	RMSQueue getQueueItemByID(Integer queueID);
 	
+	@Transactional
 	RMSQueue removeQueueItem(RMSQueue queue);
 	
+	@Transactional(readOnly = true)
 	RMSQueueSystem getQueueSystemByUUID(String queueSystemUUID);
 	
+	@Transactional(readOnly = true)
 	RMSQueueSystem getQueueSystemByID(Integer queueSystemID);
 	
 	// Boolean getBillAttribute(Bill bill, String attributeUUID);

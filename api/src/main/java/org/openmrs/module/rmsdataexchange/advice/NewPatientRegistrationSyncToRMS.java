@@ -89,10 +89,12 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 	 */
 	private static String preparePatientRMSPayload(@NotNull Patient patient) {
 		String ret = "";
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		
 		try {
 			Context.openSession();
 			Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (patient != null) {
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: New patient created: "
@@ -126,6 +128,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			}
 		}
 		catch (Exception ex) {
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.err.println("rmsdataexchange Module: Error getting new patient payload: " + ex.getMessage());
 			ex.printStackTrace();
@@ -146,11 +149,14 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 	public static Boolean sendRMSPatientRegistration(@NotNull Patient patient) {
 		Boolean ret = false;
 		String payload = preparePatientRMSPayload(patient);
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using payload: " + payload);
 			
@@ -332,6 +338,9 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			if (debugMode)
 				System.err.println("rmsdataexchange Module: Error. Failed to get auth token: " + ex.getMessage());
 			ex.printStackTrace();
+		}
+		finally {
+			Context.closeSession();
 		}
 		
 		return (ret);

@@ -23,6 +23,7 @@ import org.openmrs.module.kenyaemr.cashier.api.model.BillLineItem;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.kenyaemr.cashier.util.Utils;
 import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
+import org.openmrs.util.PrivilegeConstants;
 import org.springframework.aop.AfterReturningAdvice;
 
 /**
@@ -73,10 +74,11 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 	
 	private static String prepareNewBillRMSPayload(@NotNull Bill bill) {
 		String ret = "";
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 
 		try {
 			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (bill != null) {
 				if(debugMode) System.out.println(
 					"rmsdataexchange Module: New bill created: UUID" + bill.getUuid() + ", Total: " + bill.getTotal());
@@ -114,6 +116,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 				if(debugMode) System.out.println("rmsdataexchange Module: bill is null");
 			}
 		} catch (Exception ex) {
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if(debugMode) System.err.println("rmsdataexchange Module: Error getting new bill payload: " + ex.getMessage());
             ex.printStackTrace();
 		} finally {
@@ -146,11 +149,14 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 	public static Boolean sendRMSNewBill(@NotNull Bill bill) {
 		Boolean ret = false;
 		String payload = prepareNewBillRMSPayload(bill);
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using bill payload: " + payload);
 			
@@ -330,6 +336,9 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 			if (debugMode)
 				System.err.println("rmsdataexchange Module: Error. Failed to get auth token: " + ex.getMessage());
 			ex.printStackTrace();
+		}
+		finally {
+			Context.closeSession();
 		}
 		
 		return (ret);

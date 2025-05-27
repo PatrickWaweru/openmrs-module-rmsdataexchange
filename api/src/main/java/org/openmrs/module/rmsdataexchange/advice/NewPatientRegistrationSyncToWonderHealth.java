@@ -8,33 +8,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Set;
-import java.util.List;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -42,74 +21,47 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.BooleanType;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Meta;
+import org.hl7.fhir.r4.model.Reference;
+import org.openmrs.Location;
 import org.openmrs.Patient;
-import org.openmrs.Visit;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
 import org.openmrs.Person;
+import org.openmrs.PersonAddress;
 import org.openmrs.PersonName;
+import org.openmrs.Relationship;
+import org.openmrs.RelationshipType;
+import org.openmrs.Visit;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.fhir2.FhirConstants;
+import org.openmrs.module.fhir2.api.translators.LocationTranslator;
+import org.openmrs.module.fhir2.api.translators.PatientTranslator;
+import org.openmrs.module.kenyaemr.cashier.util.Utils;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
-import org.openmrs.module.kenyaemr.cashier.util.Utils;
-import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.util.PrivilegeConstants;
 import org.springframework.aop.AfterReturningAdvice;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import ca.uhn.fhir.context.FhirContext;
-
-import org.openmrs.api.VisitService;
-import org.openmrs.module.fhir2.api.FhirPatientService;
-import org.openmrs.module.fhir2.api.translators.PatientTranslator;
-import org.openmrs.module.fhir2.api.translators.PractitionerTranslator;
-import org.openmrs.module.fhir2.api.translators.LocationTranslator;
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.openmrs.module.kenyaemr.cashier.util.Utils;
-import org.openmrs.PersonName;
-import org.hl7.fhir.r4.model.BooleanType;
-import org.hl7.fhir.r4.model.HumanName;
-import java.util.UUID;
-
-import org.openmrs.Patient;
-import org.openmrs.Location;
-import org.openmrs.PersonName;
-import org.openmrs.PersonAddress;
-import org.openmrs.PatientIdentifier;
-import org.openmrs.api.context.Context;
-import ca.uhn.fhir.context.FhirContext;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.Meta;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.BooleanType;
-import org.hl7.fhir.r4.model.DateType;
-import org.hl7.fhir.r4.model.Bundle;
-import org.openmrs.module.fhir2.FhirConstants;
-import org.openmrs.Relationship;
-import org.openmrs.RelationshipType;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Reference;
-import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 
 /**
  * Detects when a new visit has started and syncs patient data to Wonder Health
  */
-// @Component("rmsdataexchange.NewPatientRegistrationSyncToWonderHealth")
 public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningAdvice {
 	
 	private Boolean debugMode = false;
@@ -144,6 +96,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 				// Check if the method is "saveVisit"
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: Wonder Health: Method: " + method.getName());
+				
 				if (method.getName().equals("saveVisit") && args.length > 0 && args[0] instanceof Visit) {
 					
 					for (Object object : args) {
@@ -158,6 +111,10 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 					if (visit != null && visit.getStopDatetime() == null) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Visit UUID: " + visit.getUuid());
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Visit Date Changed: " + visit.getDateChanged());
 						Patient patient = visit.getPatient();
 						
 						if (patient != null) {
@@ -211,7 +168,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 	 */
 	private String preparePatientPayload(@NotNull Patient patient) {
 		String ret = "";
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		try {
 			Context.openSession();
@@ -220,6 +177,9 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIP_TYPES);
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = AdviceUtils.isRMSLoggingEnabled();
+			
 			if (patient != null) {
 				// Create a new FHIR bundle
 				Bundle bundle = new Bundle();
@@ -481,11 +441,14 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 	public Boolean sendWonderHealthPatientRegistration(@NotNull String patient) {
 		Boolean ret = false;
 		String payload = patient;
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		// HttpsURLConnection con = null;
 		HttpURLConnection connection = null;
 		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: Wonder Health using payload: " + payload);
 			
@@ -601,6 +564,9 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 				        + ex.getMessage());
 			ex.printStackTrace();
 		}
+		finally {
+			Context.closeSession();
+		}
 		
 		return (ret);
 	}
@@ -649,7 +615,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 		
 		String payload = "";
 		
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		public syncPatientRunnable(@NotNull String payload) {
 			this.payload = payload;
@@ -660,6 +626,10 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			// Run the thread
 			
 			try {
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+				debugMode = AdviceUtils.isRMSLoggingEnabled();
+				
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: Start sending patient to Wonder Health");
 				
@@ -704,6 +674,9 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 					System.err.println("rmsdataexchange Module: Error. Failed to send patient to Wonder Health: "
 					        + ex.getMessage());
 				ex.printStackTrace();
+			}
+			finally {
+				Context.closeSession();
 			}
 		}
 	}

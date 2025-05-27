@@ -18,6 +18,7 @@ import java.util.List;
 import org.hibernate.CacheMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.DataException;
 import org.openmrs.api.db.DAOException;
@@ -113,7 +114,23 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: Saving the RMS Queue");
-		sessionFactory.getCurrentSession().saveOrUpdate(queue);
+		// sessionFactory.getCurrentSession().saveOrUpdate(queue);
+		Session session = sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			session.saveOrUpdate(queue);
+			tx.commit();
+		}
+		catch (Exception ex) {
+			if (tx != null)
+				tx.rollback();
+			throw ex;
+		}
+		finally {
+			session.close();
+		}
+		
 		return queue;
 	}
 	

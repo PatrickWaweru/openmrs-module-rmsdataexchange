@@ -31,6 +31,10 @@ public class RMSQueueSystem extends BaseOpenmrsData implements Serializable {
 	
 	@Override
 	public String toString() {
-		return "RmsQueueSystem{" + "id=" + id + ", description='" + description + '\'' + '}';
+		return "RMSQueueSystem [id=" + id + ", description=" + description + ", creator=" + creator + ", getChangedBy()="
+		        + getChangedBy() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
+		        + ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason() + ", getVoided()="
+		        + getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
 	}
+	
 }

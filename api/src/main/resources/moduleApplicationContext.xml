@@ -40,7 +40,7 @@
 
     <bean id="rmsdataexchange.BeanInterceptorConfig" class="org.openmrs.module.rmsdataexchange.advice.BeanInterceptorConfig" />
 
-    <bean id="rmsdataexchange.NewPatientRegistrationSyncToWonderHealth" class="org.openmrs.module.rmsdataexchange.advice.NewPatientRegistrationSyncToWonderHealth" />
+    <!-- <bean id="rmsdataexchange.NewPatientRegistrationSyncToWonderHealth" class="org.openmrs.module.rmsdataexchange.advice.NewPatientRegistrationSyncToWonderHealth" /> -->
 
     <bean id="rmsdataexchange.RMSDataExchangeRestController" class="org.openmrs.module.rmsdataexchange.web.controller.RMSDataExchangeRestController" />
 

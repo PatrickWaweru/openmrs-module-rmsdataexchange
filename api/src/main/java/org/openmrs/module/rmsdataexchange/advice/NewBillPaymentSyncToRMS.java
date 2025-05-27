@@ -15,12 +15,14 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaemr.cashier.api.IBillService;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.kenyaemr.cashier.api.model.PaymentMode;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
+import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 
 /**
@@ -149,25 +151,41 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 	 */
 	public static String prepareBillPaymentRMSPayload(@NotNull Payment payment) {
 		String ret = "";
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		
-		if (payment != null) {
-			if (debugMode)
-				System.out.println("rmsdataexchange Module: New bill payment created: UUID: " + payment.getUuid()
-				        + ", Amount Tendered: " + payment.getAmountTendered());
-			SimpleObject payloadPrep = new SimpleObject();
-			payloadPrep.put("bill_reference", payment.getBill().getUuid());
-			payloadPrep.put("amount_paid", payment.getAmountTendered());
-			PaymentMode paymentMode = payment.getInstanceType();
-			payloadPrep.put("payment_method_id", paymentMode != null ? paymentMode.getId() : 1);
+		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			
-			ret = payloadPrep.toJson();
-			if (debugMode)
-				System.out.println("rmsdataexchange Module: Got payment details: " + ret);
-		} else {
-			if (debugMode)
-				System.out.println("rmsdataexchange Module: payment is null");
+			if (payment != null) {
+				if (debugMode)
+					System.out.println("rmsdataexchange Module: New bill payment created: UUID: " + payment.getUuid()
+					        + ", Amount Tendered: " + payment.getAmountTendered());
+				SimpleObject payloadPrep = new SimpleObject();
+				payloadPrep.put("bill_reference", payment.getBill().getUuid());
+				payloadPrep.put("amount_paid", payment.getAmountTendered());
+				PaymentMode paymentMode = payment.getInstanceType();
+				payloadPrep.put("payment_method_id", paymentMode != null ? paymentMode.getId() : 1);
+				
+				ret = payloadPrep.toJson();
+				if (debugMode)
+					System.out.println("rmsdataexchange Module: Got payment details: " + ret);
+			} else {
+				if (debugMode)
+					System.out.println("rmsdataexchange Module: payment is null");
+			}
+			
 		}
+		catch (Exception ex) {
+			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+			if (debugMode)
+				System.err.println("rmsdataexchange Module: Error getting new bill payment payload: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+		finally {
+			Context.closeSession();
+		}
+		
 		return (ret);
 	}
 	
@@ -179,13 +197,16 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 	 */
 	public static Boolean sendRMSNewPayment(@NotNull Payment payment) {
 		Boolean ret = false;
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		String payload = prepareBillPaymentRMSPayload(payment);
 		
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using payment payload: " + payload);
 			
@@ -367,6 +388,9 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				System.err.println("rmsdataexchange Module: Error. Bill Payment Failed to get auth token: "
 				        + ex.getMessage());
 			ex.printStackTrace();
+		}
+		finally {
+			Context.closeSession();
 		}
 		
 		return (ret);

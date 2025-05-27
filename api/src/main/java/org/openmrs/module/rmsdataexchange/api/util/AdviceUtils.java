@@ -11,6 +11,8 @@ import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
+import org.openmrs.util.PrivilegeConstants;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AdviceUtils {
@@ -81,9 +83,11 @@ public class AdviceUtils {
 	public static Boolean isRMSLoggingEnabled() {
 		Boolean ret = false;
 		
+		// Context.openSession();
 		GlobalProperty globalRMSEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_LOGGING_ENABLED);
 		String isRMSLoggingEnabled = globalRMSEnabled.getPropertyValue();
+		// Context.closeSession();
 		
 		if (isRMSLoggingEnabled != null && isRMSLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -100,9 +104,11 @@ public class AdviceUtils {
 	public static Boolean isRMSIntegrationEnabled() {
 		Boolean ret = false;
 		
+		// Context.openSession();
 		GlobalProperty globalRMSEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_SYNC_ENABLED);
 		String isRMSLoggingEnabled = globalRMSEnabled.getPropertyValue();
+		// Context.closeSession();
 		
 		if (isRMSLoggingEnabled != null && isRMSLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -119,9 +125,12 @@ public class AdviceUtils {
 	public static String getRMSEndpointURL() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_ENDPOINT_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
+		// Context.closeSession();
+		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = "https://siaya.tsconect.com/api";
 		}
@@ -138,9 +147,12 @@ public class AdviceUtils {
 	public static String getWonderHealthAuthURL() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDER_HEALTH_AUTH_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
+		// Context.closeSession();
+		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = " https://kenyafhirtest.iwonderpro.com/FHIRAPI/create/login";
 		}
@@ -157,9 +169,12 @@ public class AdviceUtils {
 	public static String getWonderHealthAuthToken() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDER_HEALTH_AUTH_TOKEN);
 		String token = globalPostUrl.getPropertyValue();
+		// Context.closeSession();
+		
 		if (!StringUtils.isEmpty(token)) {
 			ret = token;
 		}
@@ -175,9 +190,12 @@ public class AdviceUtils {
 	public static String getWonderHealthEndpointURL() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDERHEALTH_ENDPOINT_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
+		// Context.closeSession();
+		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = "https://kenyafhirtest.iwonderpro.com/FHIRAPI/create";
 		}
@@ -194,9 +212,12 @@ public class AdviceUtils {
 	public static String getRMSAuthUserName() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty rmsUserGP = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_USERNAME);
 		String rmsUser = rmsUserGP.getPropertyValue();
+		// Context.closeSession();
+		
 		ret = (rmsUser == null || rmsUser.trim().isEmpty()) ? "" : rmsUser.trim();
 		
 		return (ret);
@@ -210,9 +231,12 @@ public class AdviceUtils {
 	public static String getRMSAuthPassword() {
 		String ret = "";
 		
+		// Context.openSession();
 		GlobalProperty rmsPasswordGP = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_PASSWORD);
 		String rmsPassword = rmsPasswordGP.getPropertyValue();
+		// Context.closeSession();
+		
 		ret = (rmsPassword == null || rmsPassword.trim().isEmpty()) ? "" : rmsPassword.trim();
 		
 		return (ret);
@@ -226,9 +250,11 @@ public class AdviceUtils {
 	public static Boolean isWonderHealthIntegrationEnabled() {
 		Boolean ret = false;
 		
+		// Context.openSession();
 		GlobalProperty globalWONDERHEALTHEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDERHEALTH_SYNC_ENABLED);
 		String isWONDERHEALTHLoggingEnabled = globalWONDERHEALTHEnabled.getPropertyValue();
+		// Context.closeSession();
 		
 		if (isWONDERHEALTHLoggingEnabled != null && isWONDERHEALTHLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -260,15 +286,18 @@ public class AdviceUtils {
 	 */
 	public static Boolean addSyncPayloadToQueue(String payload, RMSQueueSystem rmsQueueSystem) {
 		Boolean ret = false;
-		Boolean debugMode = isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		try {
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			debugMode = isRMSLoggingEnabled();
 			// get the system
 			RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
 			if (rmsdataexchangeService != null) {
 				if (rmsQueueSystem != null) {
 					RMSQueue rmsQueue = new RMSQueue();
 					rmsQueue.setPayload(payload);
-					rmsQueue.setSystem(rmsQueueSystem);
+					rmsQueue.setRmsSystem(rmsQueueSystem);
 					
 					rmsdataexchangeService.saveQueueItem(rmsQueue);
 					return (true);
@@ -289,6 +318,10 @@ public class AdviceUtils {
 				System.err.println("rmsdataexchange Module: Error saving payload to the queue: " + ex.getMessage());
 			ex.printStackTrace();
 		}
+		finally {
+			Context.closeSession();
+		}
+		
 		return (ret);
 	}
 	
