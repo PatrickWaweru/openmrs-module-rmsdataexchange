@@ -1,47 +1,30 @@
 package org.openmrs.module.rmsdataexchange.queue.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class RMSBillAttribute {
+import org.openmrs.BaseChangeableOpenmrsData;
+import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
+
+public class RMSBillAttribute extends BaseChangeableOpenmrsData implements Serializable {
 	
 	private Integer billAttributeId;
 	
-	private Integer billId;
+	private Bill bill;
 	
 	private String value;
 	
-	private Integer billAttributeTypeId;
-	
-	private Integer creator;
-	
-	private Date dateCreated;
-	
-	private Integer changedBy;
-	
-	private Date dateChanged;
-	
-	private Boolean voided;
-	
-	private Integer voidedBy;
-	
-	private Date dateVoided;
-	
-	private String voidReason;
-	
-	private String uuid;
+	private RMSBillAttributeType attributeType;
 	
 	// No-arg constructor required by Hibernate
 	public RMSBillAttribute() {
 	}
 	
 	// Constructor with required fields
-	public RMSBillAttribute(Integer billId, String value, Integer billAttributeTypeId, Integer creator) {
-		this.billId = billId;
+	public RMSBillAttribute(Bill bill, String value, RMSBillAttributeType attributeType) {
+		this.bill = bill;
 		this.value = value;
-		this.billAttributeTypeId = billAttributeTypeId;
-		this.creator = creator;
-		this.dateCreated = new Date();
-		this.voided = false;
+		this.attributeType = attributeType;
 	}
 	
 	// Getters and Setters
@@ -53,12 +36,12 @@ public class RMSBillAttribute {
 		this.billAttributeId = billAttributeId;
 	}
 	
-	public Integer getBillId() {
-		return billId;
+	public Bill getBill() {
+		return bill;
 	}
-	
-	public void setBillId(Integer billId) {
-		this.billId = billId;
+
+	public void setBill(Bill bill) {
+		this.bill = bill;
 	}
 	
 	public String getValue() {
@@ -69,92 +52,32 @@ public class RMSBillAttribute {
 		this.value = value;
 	}
 	
-	public Integer getBillAttributeTypeId() {
-		return billAttributeTypeId;
+	public RMSBillAttributeType getAttributeType() {
+		return attributeType;
 	}
-	
-	public void setBillAttributeTypeId(Integer billAttributeTypeId) {
-		this.billAttributeTypeId = billAttributeTypeId;
+
+	public void setAttributeType(RMSBillAttributeType attributeType) {
+		this.attributeType = attributeType;
 	}
-	
-	public Integer getCreator() {
-		return creator;
+
+	@Override
+	public Integer getId() {
+		return billAttributeId;
 	}
-	
-	public void setCreator(Integer creator) {
-		this.creator = creator;
+
+	@Override
+	public void setId(Integer id) {
+		this.billAttributeId = id;
 	}
-	
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-	
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-	
-	public Integer getChangedBy() {
-		return changedBy;
-	}
-	
-	public void setChangedBy(Integer changedBy) {
-		this.changedBy = changedBy;
-	}
-	
-	public Date getDateChanged() {
-		return dateChanged;
-	}
-	
-	public void setDateChanged(Date dateChanged) {
-		this.dateChanged = dateChanged;
-	}
-	
-	public Boolean getVoided() {
-		return voided;
-	}
-	
-	public void setVoided(Boolean voided) {
-		this.voided = voided;
-	}
-	
-	public Integer getVoidedBy() {
-		return voidedBy;
-	}
-	
-	public void setVoidedBy(Integer voidedBy) {
-		this.voidedBy = voidedBy;
-	}
-	
-	public Date getDateVoided() {
-		return dateVoided;
-	}
-	
-	public void setDateVoided(Date dateVoided) {
-		this.dateVoided = dateVoided;
-	}
-	
-	public String getVoidReason() {
-		return voidReason;
-	}
-	
-	public void setVoidReason(String voidReason) {
-		this.voidReason = voidReason;
-	}
-	
-	public String getUuid() {
-		return uuid;
-	}
-	
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
+
 	@Override
 	public String toString() {
-		return "CashierBillAttribute{" + "billAttributeId=" + billAttributeId + ", billId=" + billId + ", value='" + value
-		        + '\'' + ", billAttributeTypeId=" + billAttributeTypeId + ", creator=" + creator + ", dateCreated="
-		        + dateCreated + ", changedBy=" + changedBy + ", dateChanged=" + dateChanged + ", voided=" + voided
-		        + ", voidedBy=" + voidedBy + ", dateVoided=" + dateVoided + ", voidReason='" + voidReason + '\''
-		        + ", uuid='" + uuid + '\'' + '}';
+		return "RMSBillAttribute [billAttributeId=" + billAttributeId + ", bill=" + bill + ", value=" + value
+				+ ", attributeType=" + attributeType + ", getId()=" + getId() + ", getChangedBy()=" + getChangedBy()
+				+ ", getCreator()=" + getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()="
+				+ getDateCreated() + ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason()
+				+ ", getVoided()=" + getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid()
+				+ "]";
 	}
+
 }

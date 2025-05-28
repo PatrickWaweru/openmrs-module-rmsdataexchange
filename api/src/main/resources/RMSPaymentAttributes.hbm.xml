@@ -4,23 +4,21 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="org.openmrs.module.rmsdataexchange.queue.model">
-    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute" table="rms_payment_attribute">
+
+    <class name="org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute" table="rms_payment_attribute" dynamic-update="true" dynamic-insert="true">
+
         <id name="paymentAttributeId" type="java.lang.Integer">
             <column name="payment_attribute_id" />
             <generator class="native" />
         </id>
 
-        <property name="billPaymentId" type="java.lang.Integer">
-            <column name="bill_payment_id" not-null="true" />
-        </property>
+        <many-to-one name="payment" class="org.openmrs.module.kenyaemr.cashier.api.model.Payment" column="bill_payment_id" not-null="true"/>
 
         <property name="value" type="java.lang.String">
             <column name="value" not-null="true" length="50" />
         </property>
 
-        <property name="paymentAttributeTypeId" type="java.lang.Integer">
-            <column name="payment_attribute_type_id" not-null="true" />
-        </property>
+        <many-to-one name="attributeType" class="org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType" column="payment_attribute_type_id" not-null="true"/>
 
         <property name="creator" type="java.lang.Integer">
             <column name="creator" not-null="true" />

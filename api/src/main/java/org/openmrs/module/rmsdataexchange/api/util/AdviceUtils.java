@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +16,15 @@ import org.openmrs.Visit;
 import org.openmrs.VisitAttribute;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
+import org.openmrs.module.rmsdataexchange.api.RMSBillAttributeService;
+import org.openmrs.module.rmsdataexchange.api.RMSPaymentAttributeService;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSQueue;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.util.PrivilegeConstants;
@@ -462,6 +470,136 @@ public class AdviceUtils {
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
 			person.addAttribute(newAttribute); // inserts new
+		}
+	}
+
+	/**
+	 * Get the value of bill attribute
+	 * 
+	 * @param bill
+	 * @param attributeTypeUuid
+	 * @return
+	 */
+	public static String getBillAttributeValueByTypeUuid(Bill bill, String attributeTypeUuid) {
+		if (bill == null || attributeTypeUuid == null) {
+			return null;
+		}
+		
+		RMSBillAttributeService rmsBillAttributeService = Context.getService(RMSBillAttributeService.class);
+		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(),false);
+
+		for (RMSBillAttribute attribute : billAttributes) {
+			RMSBillAttributeType type = attribute.getAttributeType();
+			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
+				return attribute.getValue();
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Set Bill attribute
+	 * 
+	 * @param Bill
+	 * @param attributeTypeUuid
+	 * @param value
+	 */
+	public static void setBillAttributeValueByTypeUuid(Bill bill, String attributeTypeUuid, String value) {
+		if (bill == null || attributeTypeUuid == null || value == null) {
+			return;
+		}
+		
+		RMSBillAttributeService rmsBillAttributeService = Context.getService(RMSBillAttributeService.class);
+		RMSBillAttributeType attributeType = rmsBillAttributeService.getBillAttributeTypeByUuid(attributeTypeUuid);
+		if (attributeType == null) {
+			throw new IllegalArgumentException("No BillAttributeType found for UUID: " + attributeTypeUuid);
+		}
+		
+		RMSBillAttribute existingAttribute = null;
+		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(),false);
+		
+		for (RMSBillAttribute attr : billAttributes) {
+			if (attributeType.equals(attr.getAttributeType())) {
+				existingAttribute = attr;
+				break;
+			}
+		}
+		
+		if (existingAttribute != null) {
+			existingAttribute.setValue(value); // updates existing
+			rmsBillAttributeService.saveBillAttribute(existingAttribute);
+		} else {
+			RMSBillAttribute newAttribute = new RMSBillAttribute();
+			newAttribute.setAttributeType(attributeType);
+			newAttribute.setValue(value);
+			newAttribute.setBill(bill);
+			rmsBillAttributeService.saveBillAttribute(newAttribute);
+		}
+	}
+
+	/**
+	 * Get the value of payment attribute
+	 * 
+	 * @param payment
+	 * @param attributeTypeUuid
+	 * @return
+	 */
+	public static String getPaymentAttributeValueByTypeUuid(Payment payment, String attributeTypeUuid) {
+		if (payment == null || attributeTypeUuid == null) {
+			return null;
+		}
+		
+		RMSPaymentAttributeService rmsPaymentAttributeService = Context.getService(RMSPaymentAttributeService.class);
+		List<RMSPaymentAttribute> paymentAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(payment.getId(),false);
+
+		for (RMSPaymentAttribute attribute : paymentAttributes) {
+			RMSPaymentAttributeType type = attribute.getAttributeType();
+			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
+				return attribute.getValue();
+			}
+		}
+		
+		return null;
+	}
+
+	/**
+	 * Set payment attribute
+	 * 
+	 * @param Payment
+	 * @param attributeTypeUuid
+	 * @param value
+	 */
+	public static void setPaymentAttributeValueByTypeUuid(Payment payment, String attributeTypeUuid, String value) {
+		if (payment == null || attributeTypeUuid == null || value == null) {
+			return;
+		}
+		
+		RMSPaymentAttributeService rmsPaymentAttributeService = Context.getService(RMSPaymentAttributeService.class);
+		RMSPaymentAttributeType attributeType = rmsPaymentAttributeService.getPaymentAttributeTypeByUuid(attributeTypeUuid);
+		if (attributeType == null) {
+			throw new IllegalArgumentException("No PaymentAttributeType found for UUID: " + attributeTypeUuid);
+		}
+		
+		RMSPaymentAttribute existingAttribute = null;
+		List<RMSPaymentAttribute> billAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(payment.getId(),false);
+		
+		for (RMSPaymentAttribute attr : billAttributes) {
+			if (attributeType.equals(attr.getAttributeType())) {
+				existingAttribute = attr;
+				break;
+			}
+		}
+		
+		if (existingAttribute != null) {
+			existingAttribute.setValue(value); // updates existing
+			rmsPaymentAttributeService.savePaymentAttribute(existingAttribute);
+		} else {
+			RMSPaymentAttribute newAttribute = new RMSPaymentAttribute();
+			newAttribute.setAttributeType(attributeType);
+			newAttribute.setValue(value);
+			newAttribute.setPayment(payment);
+			rmsPaymentAttributeService.savePaymentAttribute(newAttribute);
 		}
 	}
 	

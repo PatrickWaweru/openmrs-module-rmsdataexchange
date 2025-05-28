@@ -18,6 +18,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.DataException;
+import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -71,20 +72,24 @@ public interface RmsdataexchangeDao {
 	List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
 	
 	List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
+
+	List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided);
 	
 	// Type Operations
 	RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
 	RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
+
+	RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid);
 	
 	List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy);
+	void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, User voidedBy);
 	
 	void unvoidPaymentAttribute(RMSPaymentAttribute paymentAttribute);
 	
-	void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy);
+	void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, User retiredBy);
 	
 	void unretirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
@@ -104,20 +109,24 @@ public interface RmsdataexchangeDao {
 	List<RMSBillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
 	
 	List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided);
+
+	List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided);
 	
 	// Type Operations
 	RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType);
 	
 	RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId);
+
+	RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid);
 	
 	List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);
 	
 	// Utility Operations
-	void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy);
+	void voidBillAttribute(RMSBillAttribute billAttribute, String reason, User voidedBy);
 	
 	void unvoidBillAttribute(RMSBillAttribute billAttribute);
 	
-	void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy);
+	void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, User retiredBy);
 	
 	void unretireBillAttributeType(RMSBillAttributeType billAttributeType);
 }

@@ -1,6 +1,7 @@
 package org.openmrs.module.rmsdataexchange.api.impl;
 
 import org.hibernate.SessionFactory;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.impl.BaseOpenmrsService;
 import org.openmrs.module.rmsdataexchange.api.RMSBillAttributeService;
@@ -58,6 +59,11 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	public List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided) {
 		return dao.getAllBillAttributes(includeVoided);
 	}
+
+	@Override
+	public List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided) {
+		return dao.getAllBillAttributesByBillId(billId, includeVoided);
+	}
 	
 	@Override
 	public RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType) {
@@ -68,6 +74,11 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	public RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
 		return dao.getBillAttributeType(billAttributeTypeId);
 	}
+
+	@Override
+	public RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid) {
+		return dao.getBillAttributeTypeByUuid(typeUuid);
+	}
 	
 	@Override
 	public List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired) {
@@ -75,7 +86,7 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	}
 	
 	@Override
-	public void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy) {
+	public void voidBillAttribute(RMSBillAttribute billAttribute, String reason, User voidedBy) {
 		dao.voidBillAttribute(billAttribute, reason, voidedBy);
 	}
 	
@@ -85,7 +96,7 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	}
 	
 	@Override
-	public void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy) {
+	public void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, User retiredBy) {
 		dao.retireBillAttributeType(billAttributeType, reason, retiredBy);
 	}
 	

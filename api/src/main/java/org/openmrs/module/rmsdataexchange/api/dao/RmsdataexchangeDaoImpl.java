@@ -21,6 +21,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.DataException;
+import org.openmrs.User;
 import org.openmrs.api.db.DAOException;
 import org.openmrs.api.db.hibernate.DbSession;
 import org.openmrs.api.db.hibernate.DbSessionFactory;
@@ -211,6 +212,15 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 		}
 		return sessionFactory.getCurrentSession().createQuery(query, RMSPaymentAttribute.class).getResultList();
 	}
+
+	@Override
+	public List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttribute.class);
+        criteria.add(Restrictions.eq("bill_payment_id", paymentId));
+        criteria.add(Restrictions.eq("voided", includeVoided));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("payment_attribute_id"));
+        return criteria.list();
+	}
 	
 	@Override
 	public RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType) {
@@ -221,6 +231,13 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	@Override
 	public RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
 		return sessionFactory.getCurrentSession().get(RMSPaymentAttributeType.class, paymentAttributeTypeId);
+	}
+
+	@Override
+	public RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttributeType.class);
+        criteria.add(Restrictions.eq("uuid", typeUuid));
+        return (RMSPaymentAttributeType) criteria.uniqueResult();
 	}
 	
 	@Override
@@ -233,7 +250,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy) {
+	public void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, User voidedBy) {
 		paymentAttribute.setVoided(true);
 		paymentAttribute.setVoidedBy(voidedBy);
 		paymentAttribute.setDateVoided(new Date());
@@ -251,7 +268,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy) {
+	public void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, User retiredBy) {
 		paymentAttributeType.setRetired(true);
 		paymentAttributeType.setRetiredBy(retiredBy);
 		paymentAttributeType.setDateRetired(new Date());
@@ -327,6 +344,15 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 		}
 		return sessionFactory.getCurrentSession().createQuery(query, RMSBillAttribute.class).getResultList();
 	}
+
+	@Override
+	public List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttribute.class);
+        criteria.add(Restrictions.eq("bill_id", billId));
+        criteria.add(Restrictions.eq("voided", includeVoided));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("bill_attribute_id"));
+        return criteria.list();
+	}
 	
 	@Override
 	public RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType) {
@@ -337,6 +363,13 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	@Override
 	public RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
 		return sessionFactory.getCurrentSession().get(RMSBillAttributeType.class, billAttributeTypeId);
+	}
+
+	@Override
+	public RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid) {
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttributeType.class);
+        criteria.add(Restrictions.eq("uuid", typeUuid));
+        return (RMSBillAttributeType) criteria.uniqueResult();
 	}
 	
 	@Override
@@ -349,7 +382,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void voidBillAttribute(RMSBillAttribute billAttribute, String reason, Integer voidedBy) {
+	public void voidBillAttribute(RMSBillAttribute billAttribute, String reason, User voidedBy) {
 		billAttribute.setVoided(true);
 		billAttribute.setVoidedBy(voidedBy);
 		billAttribute.setDateVoided(new Date());
@@ -367,7 +400,7 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	}
 	
 	@Override
-	public void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, Integer retiredBy) {
+	public void retireBillAttributeType(RMSBillAttributeType billAttributeType, String reason, User retiredBy) {
 		billAttributeType.setRetired(true);
 		billAttributeType.setRetiredBy(retiredBy);
 		billAttributeType.setDateRetired(new Date());

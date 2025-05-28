@@ -11,9 +11,11 @@
             <generator class="native"/>
         </id>
 
-        <property name="billId" column="bill_id" not-null="true"/>
+        <many-to-one name="bill" class="org.openmrs.module.kenyaemr.cashier.api.model.Bill" column="bill_id" not-null="true"/>
+
         <property name="value" column="value" not-null="true"/>
-        <property name="billAttributeTypeId" column="bill_attribute_type_id" not-null="true"/>
+
+        <many-to-one name="attributeType" class="org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType" column="bill_attribute_type_id" not-null="true"/>
         
         <property name="creator" column="creator" not-null="true"/>
         <property name="dateCreated" column="date_created" type="timestamp" not-null="true"/>

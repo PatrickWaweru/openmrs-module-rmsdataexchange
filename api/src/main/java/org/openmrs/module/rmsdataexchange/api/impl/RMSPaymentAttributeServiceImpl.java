@@ -3,6 +3,7 @@ package org.openmrs.module.rmsdataexchange.api.impl;
 import org.openmrs.module.rmsdataexchange.api.RMSPaymentAttributeService;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeDao;
 import org.hibernate.SessionFactory;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttribute;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType;
@@ -53,6 +54,11 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	public List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided) {
 		return dao.getAllPaymentAttributes(includeVoided);
 	}
+
+	@Override
+	public List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided) {
+		return dao.getAllPaymentAttributesByPaymentId(paymentId, includeVoided);
+	}
 	
 	@Override
 	public RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType) {
@@ -63,6 +69,11 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	public RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
 		return dao.getPaymentAttributeType(paymentAttributeTypeId);
 	}
+
+	@Override
+	public RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid) {
+		return dao.getPaymentAttributeTypeByUuid(typeUuid);
+	}
 	
 	@Override
 	public List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired) {
@@ -70,7 +81,7 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	}
 	
 	@Override
-	public void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, Integer voidedBy) {
+	public void voidPaymentAttribute(RMSPaymentAttribute paymentAttribute, String reason, User voidedBy) {
 		dao.voidPaymentAttribute(paymentAttribute, reason, voidedBy);
 	}
 	
@@ -80,7 +91,7 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	}
 	
 	@Override
-	public void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, Integer retiredBy) {
+	public void retirePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType, String reason, User retiredBy) {
 		dao.retirePaymentAttributeType(paymentAttributeType, reason, retiredBy);
 	}
 	

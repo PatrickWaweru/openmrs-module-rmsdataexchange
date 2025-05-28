@@ -1,14 +1,13 @@
 package org.openmrs.module.rmsdataexchange.queue.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class RMSBillAttributeType {
+import org.openmrs.BaseChangeableOpenmrsMetadata;
+
+public class RMSBillAttributeType extends BaseChangeableOpenmrsMetadata implements Serializable {
 	
 	private Integer billAttributeTypeId;
-	
-	private String name;
-	
-	private String description;
 	
 	private String format;
 	
@@ -16,41 +15,18 @@ public class RMSBillAttributeType {
 	
 	private Boolean searchable;
 	
-	private Integer creator;
-	
-	private Date dateCreated;
-	
-	private Integer changedBy;
-	
-	private Date dateChanged;
-	
-	private Boolean retired;
-	
-	private Integer retiredBy;
-	
-	private Date dateRetired;
-	
-	private String retireReason;
-	
 	private String editPrivilege;
 	
 	private Double sortWeight;
-	
-	private String uuid;
 	
 	// No-arg constructor required by Hibernate
 	public RMSBillAttributeType() {
 	}
 	
 	// Constructor with required fields
-	public RMSBillAttributeType(String name, String description, String format, Integer creator, Boolean searchable) {
-		this.name = name;
-		this.description = description;
+	public RMSBillAttributeType(String format, Boolean searchable) {
 		this.format = format;
-		this.creator = creator;
 		this.searchable = searchable;
-		this.dateCreated = new Date();
-		this.retired = false;
 	}
 	
 	// Getters and Setters
@@ -61,21 +37,15 @@ public class RMSBillAttributeType {
 	public void setBillAttributeTypeId(Integer billAttributeTypeId) {
 		this.billAttributeTypeId = billAttributeTypeId;
 	}
-	
-	public String getName() {
-		return name;
+
+	@Override
+	public Integer getId() {
+		return billAttributeTypeId;
 	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
+
+	@Override
+	public void setId(Integer id) {
+		this.billAttributeTypeId = id;
 	}
 	
 	public String getFormat() {
@@ -102,70 +72,6 @@ public class RMSBillAttributeType {
 		this.searchable = searchable;
 	}
 	
-	public Integer getCreator() {
-		return creator;
-	}
-	
-	public void setCreator(Integer creator) {
-		this.creator = creator;
-	}
-	
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-	
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-	
-	public Integer getChangedBy() {
-		return changedBy;
-	}
-	
-	public void setChangedBy(Integer changedBy) {
-		this.changedBy = changedBy;
-	}
-	
-	public Date getDateChanged() {
-		return dateChanged;
-	}
-	
-	public void setDateChanged(Date dateChanged) {
-		this.dateChanged = dateChanged;
-	}
-	
-	public Boolean getRetired() {
-		return retired;
-	}
-	
-	public void setRetired(Boolean retired) {
-		this.retired = retired;
-	}
-	
-	public Integer getRetiredBy() {
-		return retiredBy;
-	}
-	
-	public void setRetiredBy(Integer retiredBy) {
-		this.retiredBy = retiredBy;
-	}
-	
-	public Date getDateRetired() {
-		return dateRetired;
-	}
-	
-	public void setDateRetired(Date dateRetired) {
-		this.dateRetired = dateRetired;
-	}
-	
-	public String getRetireReason() {
-		return retireReason;
-	}
-	
-	public void setRetireReason(String retireReason) {
-		this.retireReason = retireReason;
-	}
-	
 	public String getEditPrivilege() {
 		return editPrivilege;
 	}
@@ -181,22 +87,15 @@ public class RMSBillAttributeType {
 	public void setSortWeight(Double sortWeight) {
 		this.sortWeight = sortWeight;
 	}
-	
-	public String getUuid() {
-		return uuid;
-	}
-	
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
+
 	@Override
 	public String toString() {
-		return "CashierBillAttributeType{" + "billAttributeTypeId=" + billAttributeTypeId + ", name='" + name + '\''
-		        + ", description='" + description + '\'' + ", format='" + format + '\'' + ", foreignKey=" + foreignKey
-		        + ", searchable=" + searchable + ", creator=" + creator + ", dateCreated=" + dateCreated + ", changedBy="
-		        + changedBy + ", dateChanged=" + dateChanged + ", retired=" + retired + ", retiredBy=" + retiredBy
-		        + ", dateRetired=" + dateRetired + ", retireReason='" + retireReason + '\'' + ", editPrivilege='"
-		        + editPrivilege + '\'' + ", sortWeight=" + sortWeight + ", uuid='" + uuid + '\'' + '}';
+		return "RMSBillAttributeType [billAttributeTypeId=" + billAttributeTypeId + ", format=" + format
+				+ ", foreignKey=" + foreignKey + ", searchable=" + searchable + ", editPrivilege=" + editPrivilege
+				+ ", sortWeight=" + sortWeight + ", getName()=" + getName() + ", getDescription()=" + getDescription()
+				+ ", getChangedBy()=" + getChangedBy() + ", getCreator()=" + getCreator() + ", getDateChanged()="
+				+ getDateChanged() + ", getDateCreated()=" + getDateCreated() + ", getDateRetired()=" + getDateRetired()
+				+ ", getRetireReason()=" + getRetireReason() + ", getRetired()=" + getRetired() + ", getRetiredBy()="
+				+ getRetiredBy() + ", getUuid()=" + getUuid() + "]";
 	}
 }

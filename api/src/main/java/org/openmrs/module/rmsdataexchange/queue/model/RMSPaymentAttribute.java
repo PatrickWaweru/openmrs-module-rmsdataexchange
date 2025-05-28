@@ -1,47 +1,29 @@
 package org.openmrs.module.rmsdataexchange.queue.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class RMSPaymentAttribute {
+import org.openmrs.BaseChangeableOpenmrsData;
+import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
+
+public class RMSPaymentAttribute extends BaseChangeableOpenmrsData implements Serializable {
 	
 	private Integer paymentAttributeId;
 	
-	private Integer billPaymentId;
+	private Payment payment;
 	
 	private String value;
 	
-	private Integer paymentAttributeTypeId;
-	
-	private Integer creator;
-	
-	private Date dateCreated;
-	
-	private Integer changedBy;
-	
-	private Date dateChanged;
-	
-	private Boolean voided;
-	
-	private Integer voidedBy;
-	
-	private Date dateVoided;
-	
-	private String voidReason;
-	
-	private String uuid;
+	private RMSPaymentAttributeType attributeType;
 	
 	// No-arg constructor required by Hibernate
 	public RMSPaymentAttribute() {
 	}
 	
 	// Constructor with required fields
-	public RMSPaymentAttribute(Integer billPaymentId, String value, Integer paymentAttributeTypeId, Integer creator) {
-		this.billPaymentId = billPaymentId;
+	public RMSPaymentAttribute(Payment payment, String value) {
+		this.payment = payment;
 		this.value = value;
-		this.paymentAttributeTypeId = paymentAttributeTypeId;
-		this.creator = creator;
-		this.dateCreated = new Date();
-		this.voided = false;
 	}
 	
 	// Getters and Setters
@@ -52,13 +34,15 @@ public class RMSPaymentAttribute {
 	public void setPaymentAttributeId(Integer paymentAttributeId) {
 		this.paymentAttributeId = paymentAttributeId;
 	}
-	
-	public Integer getBillPaymentId() {
-		return billPaymentId;
+
+	@Override
+	public Integer getId() {
+		return paymentAttributeId;
 	}
-	
-	public void setBillPaymentId(Integer billPaymentId) {
-		this.billPaymentId = billPaymentId;
+
+	@Override
+	public void setId(Integer id) {
+		this.paymentAttributeId = id;
 	}
 	
 	public String getValue() {
@@ -69,92 +53,28 @@ public class RMSPaymentAttribute {
 		this.value = value;
 	}
 	
-	public Integer getPaymentAttributeTypeId() {
-		return paymentAttributeTypeId;
+	public Payment getPayment() {
+		return payment;
 	}
-	
-	public void setPaymentAttributeTypeId(Integer paymentAttributeTypeId) {
-		this.paymentAttributeTypeId = paymentAttributeTypeId;
+
+	public void setPayment(Payment payment) {
+		this.payment = payment;
 	}
-	
-	public Integer getCreator() {
-		return creator;
+
+	public RMSPaymentAttributeType getAttributeType() {
+		return attributeType;
 	}
-	
-	public void setCreator(Integer creator) {
-		this.creator = creator;
+
+	public void setAttributeType(RMSPaymentAttributeType attributeType) {
+		this.attributeType = attributeType;
 	}
-	
-	public Date getDateCreated() {
-		return dateCreated;
-	}
-	
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-	
-	public Integer getChangedBy() {
-		return changedBy;
-	}
-	
-	public void setChangedBy(Integer changedBy) {
-		this.changedBy = changedBy;
-	}
-	
-	public Date getDateChanged() {
-		return dateChanged;
-	}
-	
-	public void setDateChanged(Date dateChanged) {
-		this.dateChanged = dateChanged;
-	}
-	
-	public Boolean getVoided() {
-		return voided;
-	}
-	
-	public void setVoided(Boolean voided) {
-		this.voided = voided;
-	}
-	
-	public Integer getVoidedBy() {
-		return voidedBy;
-	}
-	
-	public void setVoidedBy(Integer voidedBy) {
-		this.voidedBy = voidedBy;
-	}
-	
-	public Date getDateVoided() {
-		return dateVoided;
-	}
-	
-	public void setDateVoided(Date dateVoided) {
-		this.dateVoided = dateVoided;
-	}
-	
-	public String getVoidReason() {
-		return voidReason;
-	}
-	
-	public void setVoidReason(String voidReason) {
-		this.voidReason = voidReason;
-	}
-	
-	public String getUuid() {
-		return uuid;
-	}
-	
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-	
+
 	@Override
 	public String toString() {
-		return "CashierPaymentAttribute{" + "paymentAttributeId=" + paymentAttributeId + ", billPaymentId=" + billPaymentId
-		        + ", value='" + value + '\'' + ", paymentAttributeTypeId=" + paymentAttributeTypeId + ", creator=" + creator
-		        + ", dateCreated=" + dateCreated + ", changedBy=" + changedBy + ", dateChanged=" + dateChanged + ", voided="
-		        + voided + ", voidedBy=" + voidedBy + ", dateVoided=" + dateVoided + ", voidReason='" + voidReason + '\''
-		        + ", uuid='" + uuid + '\'' + '}';
+		return "RMSPaymentAttribute [paymentAttributeId=" + paymentAttributeId + ", payment=" + payment + ", value="
+				+ value + ", attributeType=" + attributeType + ", getChangedBy()=" + getChangedBy() + ", getCreator()="
+				+ getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
+				+ ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason() + ", getVoided()="
+				+ getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
 	}
 }
