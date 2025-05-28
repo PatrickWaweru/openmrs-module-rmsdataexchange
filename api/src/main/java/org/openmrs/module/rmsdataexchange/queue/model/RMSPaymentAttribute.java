@@ -34,12 +34,12 @@ public class RMSPaymentAttribute extends BaseChangeableOpenmrsData implements Se
 	public void setPaymentAttributeId(Integer paymentAttributeId) {
 		this.paymentAttributeId = paymentAttributeId;
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return paymentAttributeId;
 	}
-
+	
 	@Override
 	public void setId(Integer id) {
 		this.paymentAttributeId = id;
@@ -56,25 +56,25 @@ public class RMSPaymentAttribute extends BaseChangeableOpenmrsData implements Se
 	public Payment getPayment() {
 		return payment;
 	}
-
+	
 	public void setPayment(Payment payment) {
 		this.payment = payment;
 	}
-
+	
 	public RMSPaymentAttributeType getAttributeType() {
 		return attributeType;
 	}
-
+	
 	public void setAttributeType(RMSPaymentAttributeType attributeType) {
 		this.attributeType = attributeType;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "RMSPaymentAttribute [paymentAttributeId=" + paymentAttributeId + ", payment=" + payment + ", value="
-				+ value + ", attributeType=" + attributeType + ", getChangedBy()=" + getChangedBy() + ", getCreator()="
-				+ getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
-				+ ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason() + ", getVoided()="
-				+ getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
+		return "RMSPaymentAttribute [paymentAttributeId=" + paymentAttributeId + ", payment=" + payment + ", value=" + value
+		        + ", attributeType=" + attributeType + ", getChangedBy()=" + getChangedBy() + ", getCreator()="
+		        + getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
+		        + ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason() + ", getVoided()="
+		        + getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
 	}
 }

@@ -30,7 +30,7 @@ public class PushRMSQueueTask extends AbstractTask {
 			if (debugMode)
 				System.err.println("rmsdataexchange module: Queue Processing: There are some items in the queue");
 			for (RMSQueue item : rmsQueueItems) {
-				if(!item.getVoided()) {
+				if (!item.getVoided()) {
 					// Get the payload
 					String payload = item.getPayload();
 					// Check if item needs mods
@@ -45,26 +45,26 @@ public class PushRMSQueueTask extends AbstractTask {
 							//Delay for random seconds
 							if (debugMode)
 								System.out.println("rmsdataexchange Module: Queue Processing: Sleep for milliseconds: "
-										+ sleepTime);
+								        + sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						catch (Exception ie) {
 							Thread.currentThread().interrupt();
 						}
-
+						
 						Boolean sendPatientToRMSResult = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(payload);
-
+						
 						if (sendPatientToRMSResult == false) {
 							// Failed to send the payload. We update the retries
 							if (debugMode)
 								System.err
-										.println("rmsdataexchange Module: Queue Processing: Failed to send patient to RMS");
+								        .println("rmsdataexchange Module: Queue Processing: Failed to send patient to RMS");
 							item.setRetries(item.getRetries() + 1);
 						} else {
 							// Sent the payload. We remove the queue entry
 							if (debugMode)
 								System.out
-										.println("rmsdataexchange Module: Queue Processing: Finished sending patient to RMS");
+								        .println("rmsdataexchange Module: Queue Processing: Finished sending patient to RMS");
 							item.setRetries(item.getRetries() + 1);
 							item.setVoided(true);
 							item.setVoidReason("Payload Sent");
@@ -78,26 +78,24 @@ public class PushRMSQueueTask extends AbstractTask {
 							//Delay for random seconds
 							if (debugMode)
 								System.out.println("rmsdataexchange Module: Queue Processing: Sleep for milliseconds: "
-										+ sleepTime);
+								        + sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						catch (Exception ie) {
 							Thread.currentThread().interrupt();
 						}
-
+						
 						Boolean sendBillToRMSResult = NewBillCreationSyncToRMS.sendRMSNewBill(payload);
-
+						
 						if (sendBillToRMSResult == false) {
 							// Failed to send the payload. We update the retries
 							if (debugMode)
-								System.err
-										.println("rmsdataexchange Module: Queue Processing: Failed to send bill to RMS");
+								System.err.println("rmsdataexchange Module: Queue Processing: Failed to send bill to RMS");
 							item.setRetries(item.getRetries() + 1);
 						} else {
 							// Sent the payload. We remove the queue entry
 							if (debugMode)
-								System.out
-										.println("rmsdataexchange Module: Queue Processing: Finished sending bill to RMS");
+								System.out.println("rmsdataexchange Module: Queue Processing: Finished sending bill to RMS");
 							item.setRetries(item.getRetries() + 1);
 							item.setVoided(true);
 							item.setVoidReason("Payload Sent");
@@ -111,26 +109,26 @@ public class PushRMSQueueTask extends AbstractTask {
 							//Delay for random seconds
 							if (debugMode)
 								System.out.println("rmsdataexchange Module: Queue Processing: Sleep for milliseconds: "
-										+ sleepTime);
+								        + sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						catch (Exception ie) {
 							Thread.currentThread().interrupt();
 						}
-
+						
 						Boolean sendBillPaymentToRMSResult = NewBillPaymentSyncToRMS.sendRMSNewPayment(payload);
-
+						
 						if (sendBillPaymentToRMSResult == false) {
 							// Failed to send the payload. We update the retries
 							if (debugMode)
 								System.err
-										.println("rmsdataexchange Module: Queue Processing: Failed to send bill payment to RMS");
+								        .println("rmsdataexchange Module: Queue Processing: Failed to send bill payment to RMS");
 							item.setRetries(item.getRetries() + 1);
 						} else {
 							// Sent the payload. We remove the queue entry
 							if (debugMode)
 								System.out
-										.println("rmsdataexchange Module: Queue Processing: Finished sending bill payment to RMS");
+								        .println("rmsdataexchange Module: Queue Processing: Finished sending bill payment to RMS");
 							item.setRetries(item.getRetries() + 1);
 							item.setVoided(true);
 							item.setVoidReason("Payload Sent");
@@ -144,33 +142,34 @@ public class PushRMSQueueTask extends AbstractTask {
 							//Delay for random seconds
 							if (debugMode)
 								System.out.println("rmsdataexchange Module: Queue Processing: Sleep for milliseconds: "
-										+ sleepTime);
+								        + sleepTime);
 							Thread.sleep(sleepTime);
 						}
 						catch (Exception ie) {
 							Thread.currentThread().interrupt();
 						}
 						
-						Boolean sendWonderHealthResult = NewPatientRegistrationSyncToWonderHealth.sendWonderHealthPatientRegistration(payload);
+						Boolean sendWonderHealthResult = NewPatientRegistrationSyncToWonderHealth
+						        .sendWonderHealthPatientRegistration(payload);
 						if (sendWonderHealthResult == false) {
 							// Failed to send the payload. We update the retries
 							if (debugMode)
 								System.err
-										.println("rmsdataexchange Module: Queue Processing: Failed to send patient to Wonder Health");
+								        .println("rmsdataexchange Module: Queue Processing: Failed to send patient to Wonder Health");
 							item.setRetries(item.getRetries() + 1);
 						} else {
 							// Sent the payload. We remove the queue entry
 							if (debugMode)
 								System.out
-										.println("rmsdataexchange Module: Queue Processing: Finished sending patient to Wonder Health");
+								        .println("rmsdataexchange Module: Queue Processing: Finished sending patient to Wonder Health");
 							item.setRetries(item.getRetries() + 1);
 							item.setVoided(true);
 							item.setVoidReason("Payload Sent");
 						}
 						modified = true;
 					}
-
-					if(modified) {
+					
+					if (modified) {
 						rmsdataexchangeService.saveQueueItem(item);
 					}
 				}

@@ -212,14 +212,14 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 		}
 		return sessionFactory.getCurrentSession().createQuery(query, RMSPaymentAttribute.class).getResultList();
 	}
-
+	
 	@Override
 	public List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided) {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttribute.class);
-        criteria.add(Restrictions.eq("bill_payment_id", paymentId));
-        criteria.add(Restrictions.eq("voided", includeVoided));
-        criteria.addOrder(org.hibernate.criterion.Order.asc("payment_attribute_id"));
-        return criteria.list();
+		criteria.add(Restrictions.eq("bill_payment_id", paymentId));
+		criteria.add(Restrictions.eq("voided", includeVoided));
+		criteria.addOrder(org.hibernate.criterion.Order.asc("payment_attribute_id"));
+		return criteria.list();
 	}
 	
 	@Override
@@ -232,12 +232,12 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	public RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
 		return sessionFactory.getCurrentSession().get(RMSPaymentAttributeType.class, paymentAttributeTypeId);
 	}
-
+	
 	@Override
 	public RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid) {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttributeType.class);
-        criteria.add(Restrictions.eq("uuid", typeUuid));
-        return (RMSPaymentAttributeType) criteria.uniqueResult();
+		criteria.add(Restrictions.eq("uuid", typeUuid));
+		return (RMSPaymentAttributeType) criteria.uniqueResult();
 	}
 	
 	@Override
@@ -344,14 +344,14 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 		}
 		return sessionFactory.getCurrentSession().createQuery(query, RMSBillAttribute.class).getResultList();
 	}
-
+	
 	@Override
 	public List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided) {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttribute.class);
-        criteria.add(Restrictions.eq("bill_id", billId));
-        criteria.add(Restrictions.eq("voided", includeVoided));
-        criteria.addOrder(org.hibernate.criterion.Order.asc("bill_attribute_id"));
-        return criteria.list();
+		criteria.add(Restrictions.eq("bill_id", billId));
+		criteria.add(Restrictions.eq("voided", includeVoided));
+		criteria.addOrder(org.hibernate.criterion.Order.asc("bill_attribute_id"));
+		return criteria.list();
 	}
 	
 	@Override
@@ -364,12 +364,12 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	public RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
 		return sessionFactory.getCurrentSession().get(RMSBillAttributeType.class, billAttributeTypeId);
 	}
-
+	
 	@Override
 	public RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid) {
 		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttributeType.class);
-        criteria.add(Restrictions.eq("uuid", typeUuid));
-        return (RMSBillAttributeType) criteria.uniqueResult();
+		criteria.add(Restrictions.eq("uuid", typeUuid));
+		return (RMSBillAttributeType) criteria.uniqueResult();
 	}
 	
 	@Override

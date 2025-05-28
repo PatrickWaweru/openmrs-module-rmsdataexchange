@@ -54,7 +54,7 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	public List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided) {
 		return dao.getAllPaymentAttributes(includeVoided);
 	}
-
+	
 	@Override
 	public List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided) {
 		return dao.getAllPaymentAttributesByPaymentId(paymentId, includeVoided);
@@ -69,7 +69,7 @@ public class RMSPaymentAttributeServiceImpl extends BaseOpenmrsService implement
 	public RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId) {
 		return dao.getPaymentAttributeType(paymentAttributeTypeId);
 	}
-
+	
 	@Override
 	public RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid) {
 		return dao.getPaymentAttributeTypeByUuid(typeUuid);

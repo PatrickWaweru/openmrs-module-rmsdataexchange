@@ -37,12 +37,12 @@ public class RMSPaymentAttributeType extends BaseChangeableOpenmrsMetadata imple
 	public void setPaymentAttributeTypeId(Integer paymentAttributeTypeId) {
 		this.paymentAttributeTypeId = paymentAttributeTypeId;
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return paymentAttributeTypeId;
 	}
-
+	
 	@Override
 	public void setId(Integer id) {
 		this.paymentAttributeTypeId = id;
@@ -87,16 +87,16 @@ public class RMSPaymentAttributeType extends BaseChangeableOpenmrsMetadata imple
 	public void setSortWeight(Double sortWeight) {
 		this.sortWeight = sortWeight;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "RMSPaymentAttributeType [paymentAttributeTypeId=" + paymentAttributeTypeId + ", format=" + format
-				+ ", foreignKey=" + foreignKey + ", searchable=" + searchable + ", editPrivilege=" + editPrivilege
-				+ ", sortWeight=" + sortWeight + ", getChangedBy()=" + getChangedBy() + ", getCreator()=" + getCreator()
-				+ ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
-				+ ", getDateRetired()=" + getDateRetired() + ", getDescription()=" + getDescription() + ", getName()="
-				+ getName() + ", getRetireReason()=" + getRetireReason() + ", getRetired()=" + getRetired()
-				+ ", getRetiredBy()=" + getRetiredBy() + ", getUuid()=" + getUuid() + "]";
+		        + ", foreignKey=" + foreignKey + ", searchable=" + searchable + ", editPrivilege=" + editPrivilege
+		        + ", sortWeight=" + sortWeight + ", getChangedBy()=" + getChangedBy() + ", getCreator()=" + getCreator()
+		        + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()=" + getDateCreated()
+		        + ", getDateRetired()=" + getDateRetired() + ", getDescription()=" + getDescription() + ", getName()="
+		        + getName() + ", getRetireReason()=" + getRetireReason() + ", getRetired()=" + getRetired()
+		        + ", getRetiredBy()=" + getRetiredBy() + ", getUuid()=" + getUuid() + "]";
 	}
 	
 }

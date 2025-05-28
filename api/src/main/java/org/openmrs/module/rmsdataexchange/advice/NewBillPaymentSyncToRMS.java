@@ -15,13 +15,16 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.openmrs.Patient;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.kenyaemr.cashier.api.IBillService;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.kenyaemr.cashier.api.model.PaymentMode;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
+import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
 import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
+import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.util.PrivilegeConstants;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 
@@ -87,10 +90,19 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 								if(debugMode) System.out.println("rmsdataexchange Module: New bill payments made: " + payments.size());
 
 								for(Payment payment : payments) {
-									// Use a thread to send the data. This frees up the frontend to proceed
-									syncPaymentRunnable runner = new syncPaymentRunnable(payment);
-									Thread thread = new Thread(runner);
-									thread.start();
+									// Check if the patient has already been synced (using patient attribute)
+									String attrCheck = AdviceUtils.getPaymentAttributeValueByTypeUuid(payment, RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
+									if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+											|| attrCheck.trim().equalsIgnoreCase("")) {
+										// Use a thread to send the data. This frees up the frontend to proceed
+										String payload = prepareBillPaymentRMSPayload(payment);
+										syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
+										Thread thread = new Thread(runner);
+										thread.start();
+									} else {
+										if (debugMode)
+											System.out.println("rmsdataexchange Module: RMS: Error: Payment already sent to remote");
+									}
 								}
 							}
 						}
@@ -135,10 +147,19 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				System.out.println("rmsdataexchange Module: New bill payments made: " + payments.size());
 			
 			for (Payment payment : payments) {
-				// Use a thread to send the data. This frees up the frontend to proceed
-				syncPaymentRunnable runner = new syncPaymentRunnable(payment);
-				Thread thread = new Thread(runner);
-				thread.start();
+				// Check if the patient has already been synced (using patient attribute)
+				String attrCheck = AdviceUtils.getPaymentAttributeValueByTypeUuid(payment,
+				    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
+				if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty() || attrCheck.trim().equalsIgnoreCase("")) {
+					// Use a thread to send the data. This frees up the frontend to proceed
+					String payload = prepareBillPaymentRMSPayload(payment);
+					syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
+					Thread thread = new Thread(runner);
+					thread.start();
+				} else {
+					if (debugMode)
+						System.out.println("rmsdataexchange Module: RMS: Error: Payment already sent to remote");
+				}
 			}
 		}
 	}
@@ -188,7 +209,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		
 		return (ret);
 	}
-
+	
 	/**
 	 * Send the new payment payload to RMS
 	 * 
@@ -413,10 +434,13 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		
 		Payment payment = new Payment();
 		
+		String payload = "";
+		
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		
-		public syncPaymentRunnable(@NotNull Payment payment) {
+		public syncPaymentRunnable(@NotNull Payment payment, @NotNull String payload) {
 			this.payment = payment;
+			this.payload = payload;
 		}
 		
 		@Override
@@ -442,15 +466,36 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				// If the patient doesnt exist, send the patient to RMS
 				if (debugMode)
 					System.out.println("RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
-				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(payment.getBill()
-				        .getPatient());
+				Patient patient = payment.getBill().getPatient();
+				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
 				
-				if (testPatientSending) {
+				if (!testPatientSending) {
+					// Mark NOT sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+					Context.getPatientService().savePatient(patient);
 					if (debugMode)
-						System.out.println("rmsdataexchange Module: Finished sending Patient to RMS");
+						System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
+					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
+					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
+					        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_PATIENT);
+					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
+					if (addToQueue) {
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+					} else {
+						if (debugMode)
+							System.err.println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+					}
 				} else {
+					// Success sending the patient
 					if (debugMode)
-						System.out.println("rmsdataexchange Module: Failed to send Patient to RMS");
+						System.out.println("rmsdataexchange Module: Finished sending patient to RMS");
+					
+					// Mark sent using person attribute
+					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
+					Context.getPatientService().savePatient(patient);
 				}
 				
 				sleepTime = AdviceUtils.getRandomInt(5000, 10000);
@@ -468,14 +513,33 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				// If the bill doesnt exist, send the bill to RMS
 				if (debugMode)
 					System.out.println("RMS Sync RMSDataExchange Module Bill Payment: Send the bill next");
-				Boolean testBillSending = NewBillCreationSyncToRMS.sendRMSNewBill(payment.getBill());
+				Bill bill = payment.getBill();
+				Boolean testBillSending = NewBillCreationSyncToRMS.sendRMSNewBill(bill);
 				
 				if (testBillSending) {
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Finished sending Bill to RMS");
+					// Mark sent using bill attribute
+					AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+					    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 				} else {
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send Bill to RMS");
+					// Mark NOT sent using bill attribute
+					AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+					    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+					
+					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
+					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
+					        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_BILL);
+					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
+					if (addToQueue) {
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Finished adding bill to RMS Bill Queue");
+					} else {
+						if (debugMode)
+							System.err.println("rmsdataexchange Module: Error: Failed to add bill to RMS Bill Queue");
+					}
 				}
 				
 				sleepTime = AdviceUtils.getRandomInt(5000, 10000);
@@ -494,11 +558,30 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				Boolean testPaymentSending = sendRMSNewPayment(payment);
 				
 				if (testPaymentSending) {
+					// Success sending the payment
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Successfully Finished sending payment to RMS");
+					
+					// Mark sent using payment attribute
+					AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+					    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 				} else {
+					// Mark NOT sent using payment attribute
+					AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+					    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send payment to RMS");
+					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
+					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
+					        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_PAYMENT);
+					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
+					if (addToQueue) {
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Finished adding payment to RMS payment Queue");
+					} else {
+						if (debugMode)
+							System.err.println("rmsdataexchange Module: Error: Failed to add payment to RMS payment Queue");
+					}
 				}
 			}
 			catch (Exception ex) {

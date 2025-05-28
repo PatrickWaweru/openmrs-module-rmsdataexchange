@@ -39,7 +39,7 @@ public class RMSBillAttribute extends BaseChangeableOpenmrsData implements Seria
 	public Bill getBill() {
 		return bill;
 	}
-
+	
 	public void setBill(Bill bill) {
 		this.bill = bill;
 	}
@@ -55,29 +55,28 @@ public class RMSBillAttribute extends BaseChangeableOpenmrsData implements Seria
 	public RMSBillAttributeType getAttributeType() {
 		return attributeType;
 	}
-
+	
 	public void setAttributeType(RMSBillAttributeType attributeType) {
 		this.attributeType = attributeType;
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return billAttributeId;
 	}
-
+	
 	@Override
 	public void setId(Integer id) {
 		this.billAttributeId = id;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "RMSBillAttribute [billAttributeId=" + billAttributeId + ", bill=" + bill + ", value=" + value
-				+ ", attributeType=" + attributeType + ", getId()=" + getId() + ", getChangedBy()=" + getChangedBy()
-				+ ", getCreator()=" + getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()="
-				+ getDateCreated() + ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason()
-				+ ", getVoided()=" + getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid()
-				+ "]";
+		        + ", attributeType=" + attributeType + ", getId()=" + getId() + ", getChangedBy()=" + getChangedBy()
+		        + ", getCreator()=" + getCreator() + ", getDateChanged()=" + getDateChanged() + ", getDateCreated()="
+		        + getDateCreated() + ", getDateVoided()=" + getDateVoided() + ", getVoidReason()=" + getVoidReason()
+		        + ", getVoided()=" + getVoided() + ", getVoidedBy()=" + getVoidedBy() + ", getUuid()=" + getUuid() + "]";
 	}
-
+	
 }

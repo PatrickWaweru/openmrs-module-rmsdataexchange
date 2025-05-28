@@ -72,14 +72,14 @@ public interface RmsdataexchangeDao {
 	List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
 	
 	List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
-
+	
 	List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided);
 	
 	// Type Operations
 	RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
 	RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
-
+	
 	RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid);
 	
 	List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);
@@ -109,14 +109,14 @@ public interface RmsdataexchangeDao {
 	List<RMSBillAttribute> getBillAttributesByTypeId(Integer billAttributeTypeId);
 	
 	List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided);
-
+	
 	List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided);
 	
 	// Type Operations
 	RMSBillAttributeType saveBillAttributeType(RMSBillAttributeType billAttributeType);
 	
 	RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId);
-
+	
 	RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid);
 	
 	List<RMSBillAttributeType> getAllBillAttributeTypes(Boolean includeRetired);

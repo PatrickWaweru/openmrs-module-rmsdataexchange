@@ -59,7 +59,7 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	public List<RMSBillAttribute> getAllBillAttributes(Boolean includeVoided) {
 		return dao.getAllBillAttributes(includeVoided);
 	}
-
+	
 	@Override
 	public List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided) {
 		return dao.getAllBillAttributesByBillId(billId, includeVoided);
@@ -74,7 +74,7 @@ public class RMSBillAttributeServiceImpl extends BaseOpenmrsService implements R
 	public RMSBillAttributeType getBillAttributeType(Integer billAttributeTypeId) {
 		return dao.getBillAttributeType(billAttributeTypeId);
 	}
-
+	
 	@Override
 	public RMSBillAttributeType getBillAttributeTypeByUuid(String typeUuid) {
 		return dao.getBillAttributeTypeByUuid(typeUuid);

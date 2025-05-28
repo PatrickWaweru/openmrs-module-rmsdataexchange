@@ -27,14 +27,14 @@ public interface RMSPaymentAttributeService extends OpenmrsService {
 	List<RMSPaymentAttribute> getPaymentAttributesByTypeId(Integer paymentAttributeTypeId);
 	
 	List<RMSPaymentAttribute> getAllPaymentAttributes(Boolean includeVoided);
-
+	
 	List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided);
 	
 	// Type Operations
 	RMSPaymentAttributeType savePaymentAttributeType(RMSPaymentAttributeType paymentAttributeType);
 	
 	RMSPaymentAttributeType getPaymentAttributeType(Integer paymentAttributeTypeId);
-
+	
 	RMSPaymentAttributeType getPaymentAttributeTypeByUuid(String typeUuid);
 	
 	List<RMSPaymentAttributeType> getAllPaymentAttributeTypes(Boolean includeRetired);

@@ -37,12 +37,12 @@ public class RMSBillAttributeType extends BaseChangeableOpenmrsMetadata implemen
 	public void setBillAttributeTypeId(Integer billAttributeTypeId) {
 		this.billAttributeTypeId = billAttributeTypeId;
 	}
-
+	
 	@Override
 	public Integer getId() {
 		return billAttributeTypeId;
 	}
-
+	
 	@Override
 	public void setId(Integer id) {
 		this.billAttributeTypeId = id;
@@ -87,15 +87,15 @@ public class RMSBillAttributeType extends BaseChangeableOpenmrsMetadata implemen
 	public void setSortWeight(Double sortWeight) {
 		this.sortWeight = sortWeight;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "RMSBillAttributeType [billAttributeTypeId=" + billAttributeTypeId + ", format=" + format
-				+ ", foreignKey=" + foreignKey + ", searchable=" + searchable + ", editPrivilege=" + editPrivilege
-				+ ", sortWeight=" + sortWeight + ", getName()=" + getName() + ", getDescription()=" + getDescription()
-				+ ", getChangedBy()=" + getChangedBy() + ", getCreator()=" + getCreator() + ", getDateChanged()="
-				+ getDateChanged() + ", getDateCreated()=" + getDateCreated() + ", getDateRetired()=" + getDateRetired()
-				+ ", getRetireReason()=" + getRetireReason() + ", getRetired()=" + getRetired() + ", getRetiredBy()="
-				+ getRetiredBy() + ", getUuid()=" + getUuid() + "]";
+		return "RMSBillAttributeType [billAttributeTypeId=" + billAttributeTypeId + ", format=" + format + ", foreignKey="
+		        + foreignKey + ", searchable=" + searchable + ", editPrivilege=" + editPrivilege + ", sortWeight="
+		        + sortWeight + ", getName()=" + getName() + ", getDescription()=" + getDescription() + ", getChangedBy()="
+		        + getChangedBy() + ", getCreator()=" + getCreator() + ", getDateChanged()=" + getDateChanged()
+		        + ", getDateCreated()=" + getDateCreated() + ", getDateRetired()=" + getDateRetired()
+		        + ", getRetireReason()=" + getRetireReason() + ", getRetired()=" + getRetired() + ", getRetiredBy()="
+		        + getRetiredBy() + ", getUuid()=" + getUuid() + "]";
 	}
 }

@@ -414,7 +414,7 @@ public class AdviceUtils {
 			visit.addAttribute(newAttribute); // inserts new
 		}
 	}
-
+	
 	/**
 	 * Get the value of person attribute
 	 * 
@@ -472,7 +472,7 @@ public class AdviceUtils {
 			person.addAttribute(newAttribute); // inserts new
 		}
 	}
-
+	
 	/**
 	 * Get the value of bill attribute
 	 * 
@@ -486,8 +486,8 @@ public class AdviceUtils {
 		}
 		
 		RMSBillAttributeService rmsBillAttributeService = Context.getService(RMSBillAttributeService.class);
-		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(),false);
-
+		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(), false);
+		
 		for (RMSBillAttribute attribute : billAttributes) {
 			RMSBillAttributeType type = attribute.getAttributeType();
 			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
@@ -497,7 +497,7 @@ public class AdviceUtils {
 		
 		return null;
 	}
-
+	
 	/**
 	 * Set Bill attribute
 	 * 
@@ -517,7 +517,7 @@ public class AdviceUtils {
 		}
 		
 		RMSBillAttribute existingAttribute = null;
-		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(),false);
+		List<RMSBillAttribute> billAttributes = rmsBillAttributeService.getAllBillAttributesByBillId(bill.getId(), false);
 		
 		for (RMSBillAttribute attr : billAttributes) {
 			if (attributeType.equals(attr.getAttributeType())) {
@@ -537,7 +537,7 @@ public class AdviceUtils {
 			rmsBillAttributeService.saveBillAttribute(newAttribute);
 		}
 	}
-
+	
 	/**
 	 * Get the value of payment attribute
 	 * 
@@ -551,8 +551,9 @@ public class AdviceUtils {
 		}
 		
 		RMSPaymentAttributeService rmsPaymentAttributeService = Context.getService(RMSPaymentAttributeService.class);
-		List<RMSPaymentAttribute> paymentAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(payment.getId(),false);
-
+		List<RMSPaymentAttribute> paymentAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(
+		    payment.getId(), false);
+		
 		for (RMSPaymentAttribute attribute : paymentAttributes) {
 			RMSPaymentAttributeType type = attribute.getAttributeType();
 			if (type != null && attributeTypeUuid.equals(type.getUuid())) {
@@ -562,7 +563,7 @@ public class AdviceUtils {
 		
 		return null;
 	}
-
+	
 	/**
 	 * Set payment attribute
 	 * 
@@ -582,7 +583,8 @@ public class AdviceUtils {
 		}
 		
 		RMSPaymentAttribute existingAttribute = null;
-		List<RMSPaymentAttribute> billAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(payment.getId(),false);
+		List<RMSPaymentAttribute> billAttributes = rmsPaymentAttributeService.getAllPaymentAttributesByPaymentId(
+		    payment.getId(), false);
 		
 		for (RMSPaymentAttribute attr : billAttributes) {
 			if (attributeType.equals(attr.getAttributeType())) {
