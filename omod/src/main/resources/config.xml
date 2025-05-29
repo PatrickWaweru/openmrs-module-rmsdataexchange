@@ -47,10 +47,10 @@
 		<class>org.openmrs.module.rmsdataexchange.advice.NewPatientRegistrationSyncToWonderHealth</class>
 	</advice>
 
-	<!-- <advice>
+	<advice>
 		<point>org.openmrs.module.kenyaemr.cashier.api.IBillService</point>
 		<class>org.openmrs.module.rmsdataexchange.advice.NewBillCreationSyncToRMS</class>
-	</advice> -->
+	</advice>
 
 	<!-- PDSL RMS -->
 	<globalProperty>

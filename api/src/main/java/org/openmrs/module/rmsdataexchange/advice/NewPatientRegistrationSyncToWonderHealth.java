@@ -661,7 +661,6 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 		
 		@Override
 		public void run() {
-			// Run the thread
 			
 			try {
 				Context.openSession();

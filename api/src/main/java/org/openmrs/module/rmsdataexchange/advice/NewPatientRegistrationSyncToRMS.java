@@ -50,11 +50,14 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 						// Check if the patient has already been synced (using patient attribute)
 						String attrCheck = AdviceUtils.getPersonAttributeValueByTypeUuid(patient,
 						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
-						if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: RMS: Attribute check is: " + attrCheck);
+						if (attrCheck == null || attrCheck.trim().equalsIgnoreCase("0") || attrCheck.isEmpty()
 						        || attrCheck.trim().equalsIgnoreCase("")) {
 							Date patientCreationDate = patient.getDateCreated();
-							System.out.println("rmsdataexchange Module: RMS Patient Date Changed: "
-							        + patient.getDateChanged());
+							if (debugMode)
+								System.out.println("rmsdataexchange Module: RMS Patient Date Changed: "
+								        + patient.getDateChanged());
 							if (debugMode)
 								System.out.println("rmsdataexchange Module: patient was created on: " + patientCreationDate);
 							
@@ -82,7 +85,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 							}
 						} else {
 							if (debugMode)
-								System.out.println("rmsdataexchange Module: RMS: Error: Patient already sent to remote");
+								System.out.println("rmsdataexchange Module: RMS: Patient already sent to remote. we ignore");
 						}
 					} else {
 						if (debugMode)
@@ -419,7 +422,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		
 		Patient patient = null;
 		
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		public syncPatientRunnable(@NotNull String payload, @NotNull Patient patient) {
 			this.payload = payload;
@@ -431,6 +434,11 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			// Run the thread
 			
 			try {
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				debugMode = AdviceUtils.isRMSLoggingEnabled();
+				
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: Start sending patient to RMS");
 				
@@ -449,10 +457,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 				Boolean testPatientSending = sendRMSPatientRegistration(payload);
 				
 				if (!testPatientSending) {
-					// Mark NOT sent using person attribute
-					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
-					Context.getPatientService().savePatient(patient);
+					
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
@@ -462,9 +467,15 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+						// Mark sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+						// Mark NOT sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				} else {
 					// Success sending the patient
@@ -474,7 +485,6 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 					// Mark sent using person attribute
 					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
 					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
-					Context.getPatientService().savePatient(patient);
 				}
 			}
 			catch (Exception ex) {

@@ -52,7 +52,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 					// Check if the bill has already been synced (using bill attribute)
 					String attrCheck = AdviceUtils.getBillAttributeValueByTypeUuid(bill,
 					    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
-					if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+					if (attrCheck == null || attrCheck.trim().equalsIgnoreCase("0") || attrCheck.isEmpty()
 					        || attrCheck.trim().equalsIgnoreCase("")) {
 						Date billCreationDate = bill.getDateCreated();
 						if (debugMode)
@@ -377,7 +377,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		
 		String payload = "";
 		
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		public syncBillRunnable(@NotNull Bill bill, @NotNull String payload) {
 			this.bill = bill;
@@ -386,60 +386,80 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		
 		@Override
 		public void run() {
-			// Run the thread
 			
 			try {
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				debugMode = AdviceUtils.isRMSLoggingEnabled();
+				
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: Start sending Bill to RMS");
 				
-				Integer sleepTime = AdviceUtils.getRandomInt(5000, 10000);
-				// Delay
-				try {
-					//Delay for random seconds
-					if (debugMode)
-						System.out.println("rmsdataexchange Module: Sleep for milliseconds: " + sleepTime);
-					Thread.sleep(sleepTime);
-				}
-				catch (Exception ie) {
-					Thread.currentThread().interrupt();
-				}
-				
-				// If the patient doesnt exist, send the patient to RMS
-				if (debugMode)
-					System.out.println("RMS Sync RMSDataExchange Module Bill: Send the patient first");
+				// Send Patient
 				Patient patient = bill.getPatient();
-				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
-				
-				if (!testPatientSending) {
-					// Mark NOT sent using person attribute
-					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
-					Context.getPatientService().savePatient(patient);
+				String attrCheck = AdviceUtils.getPersonAttributeValueByTypeUuid(patient,
+				    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID);
+				if (debugMode)
+					System.out.println("rmsdataexchange Module: RMS: Attribute check is: " + attrCheck);
+				if (attrCheck == null || attrCheck.trim().equalsIgnoreCase("0") || attrCheck.isEmpty()
+				        || attrCheck.trim().equalsIgnoreCase("")) {
+					Integer sleepTime = AdviceUtils.getRandomInt(5000, 10000);
+					// Delay
+					try {
+						//Delay for random seconds
+						if (debugMode)
+							System.out.println("rmsdataexchange Module: Sleep for milliseconds: " + sleepTime);
+						Thread.sleep(sleepTime);
+					}
+					catch (Exception ie) {
+						Thread.currentThread().interrupt();
+					}
+					
+					// If the patient doesnt exist, send the patient to RMS
 					if (debugMode)
-						System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
-					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
-					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
-					        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_PATIENT);
-					Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
-					if (addToQueue) {
+						System.out.println("RMS Sync RMSDataExchange Module Bill: Send the patient first");
+					Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
+					
+					if (!testPatientSending) {
+						
 						if (debugMode)
-							System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+							System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
+						RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
+						RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
+						        .getQueueSystemByUUID(RMSModuleConstants.RMS_SYSTEM_PATIENT);
+						Boolean addToQueue = AdviceUtils.addSyncPayloadToQueue(payload, rmsQueueSystem);
+						if (addToQueue) {
+							if (debugMode)
+								System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+							
+							// Mark sent using person attribute
+							AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+							    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
+						} else {
+							if (debugMode)
+								System.err
+								        .println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+							
+							// Mark NOT sent using person attribute
+							AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+							    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+						}
 					} else {
+						// Success sending the patient
 						if (debugMode)
-							System.err.println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+							System.out.println("rmsdataexchange Module: Finished sending patient to RMS");
+						
+						// Mark sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					}
 				} else {
-					// Success sending the patient
 					if (debugMode)
-						System.out.println("rmsdataexchange Module: Finished sending patient to RMS");
-					
-					// Mark sent using person attribute
-					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
-					Context.getPatientService().savePatient(patient);
+						System.out.println("rmsdataexchange Module: RMS: Patient already sent to remote. we ignore");
 				}
 				
-				sleepTime = AdviceUtils.getRandomInt(5000, 10000);
+				Integer sleepTime = AdviceUtils.getRandomInt(5000, 10000);
 				// Delay
 				try {
 					//Delay for random seconds
@@ -466,9 +486,6 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 				} else {
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send Bill to RMS");
-					// Mark NOT sent using bill attribute
-					AdviceUtils.setBillAttributeValueByTypeUuid(bill,
-					    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
 					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
@@ -477,9 +494,15 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding bill to RMS Bill Queue");
+						// Mark sent using bill attribute
+						AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+						    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add bill to RMS Bill Queue");
+						// Mark NOT sent using bill attribute
+						AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+						    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				}
 			}
