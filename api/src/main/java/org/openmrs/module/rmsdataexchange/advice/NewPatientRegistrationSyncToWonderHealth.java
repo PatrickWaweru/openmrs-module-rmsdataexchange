@@ -117,7 +117,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Wonder Health: Sync check is: " + syncCheck);
 						
-						if (syncCheck == null || syncCheck == "0" || syncCheck.isEmpty()
+						if (syncCheck == null || syncCheck.trim().equalsIgnoreCase("0") || syncCheck.isEmpty()
 						        || syncCheck.trim().equalsIgnoreCase("")) {
 							if (debugMode)
 								System.out
@@ -127,7 +127,10 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 							// Check if the patient has already been synced (using patient attribute)
 							String attrCheck = AdviceUtils.getPersonAttributeValueByTypeUuid(visit.getPatient(),
 							    RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID);
-							if (attrCheck == null || attrCheck == "0" || attrCheck.isEmpty()
+							if (debugMode)
+								System.out
+								        .println("rmsdataexchange Module: Wonder Health: Attribute check is: " + attrCheck);
+							if (attrCheck == null || attrCheck.trim().equalsIgnoreCase("0") || attrCheck.isEmpty()
 							        || attrCheck.trim().equalsIgnoreCase("")) {
 								if (debugMode)
 									System.out.println("rmsdataexchange Module: Visit End Date: " + visit.getStopDatetime());
@@ -170,16 +173,17 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 							} else {
 								if (debugMode)
 									System.out
-									        .println("rmsdataexchange Module: Wonder Health: Error: Patient already sent to remote");
+									        .println("rmsdataexchange Module: Wonder Health: Patient already sent to remote. We ignore.");
 							}
 						} else {
 							if (debugMode)
-								System.out.println("rmsdataexchange Module: Wonder Health: Error: Visit already processed");
+								System.out
+								        .println("rmsdataexchange Module: Wonder Health: Visit already processed. We ignore.");
 						}
 						
 					} else {
 						if (debugMode)
-							System.out.println("rmsdataexchange Module: Wonder Health: Error: Not a new visit.");
+							System.out.println("rmsdataexchange Module: Wonder Health: Not a new visit. We ignore.");
 					}
 				}
 			}
@@ -662,6 +666,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			try {
 				Context.openSession();
 				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 				debugMode = AdviceUtils.isRMSLoggingEnabled();
 				
 				if (debugMode)
@@ -680,11 +685,8 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 				}
 				
 				Boolean sendWonderHealthResult = sendWonderHealthPatientRegistration(payload);
+				
 				if (sendWonderHealthResult == false) {
-					// Mark NOT sent using person attribute
-					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-					    RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "0");
-					Context.getPatientService().savePatient(patient);
 					// Failed to send the payload. We put it in the queue
 					if (debugMode)
 						System.err
@@ -696,10 +698,16 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding patient to Wonder Health Queue");
+						// Mark sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err
 							        .println("rmsdataexchange Module: Error: Failed to add patient to Wonder Health Queue");
+						// Mark NOT sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "0");
 					}
 				} else {
 					// Success sending the patient
@@ -708,7 +716,6 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 					// Mark sent using person attribute
 					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
 					    RMSModuleConstants.PERSON_ATTRIBUTE_WONDER_HEALTH_SYNCHRONIZED_UUID, "1");
-					Context.getPatientService().savePatient(patient);
 				}
 				
 			}

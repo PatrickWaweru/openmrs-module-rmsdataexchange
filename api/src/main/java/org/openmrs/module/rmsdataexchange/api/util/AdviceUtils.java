@@ -449,6 +449,14 @@ public class AdviceUtils {
 			return;
 		}
 		
+		Context.openSession();
+		Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+		Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+		Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
 		PersonAttributeType attributeType = Context.getPersonService().getPersonAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
 			throw new IllegalArgumentException("No PersonAttributeType found for UUID: " + attributeTypeUuid);
@@ -465,12 +473,17 @@ public class AdviceUtils {
 		
 		if (existingAttribute != null) {
 			existingAttribute.setValue(value); // updates existing
+			Context.getPersonService().savePerson(person);
 		} else {
 			PersonAttribute newAttribute = new PersonAttribute();
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
+			newAttribute.setCreator(Context.getUserService().getUser(1));
+			newAttribute.setDateCreated(new Date());
 			person.addAttribute(newAttribute); // inserts new
+			Context.getPersonService().savePerson(person);
 		}
+		Context.closeSession();
 	}
 	
 	/**
