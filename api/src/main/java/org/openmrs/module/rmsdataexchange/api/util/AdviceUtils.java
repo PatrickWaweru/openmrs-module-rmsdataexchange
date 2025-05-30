@@ -546,6 +546,8 @@ public class AdviceUtils {
 			RMSBillAttribute newAttribute = new RMSBillAttribute();
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
+			newAttribute.setCreator(Context.getUserService().getUser(1));
+			newAttribute.setDateCreated(new Date());
 			newAttribute.setBill(bill);
 			rmsBillAttributeService.saveBillAttribute(newAttribute);
 		}
@@ -613,6 +615,8 @@ public class AdviceUtils {
 			RMSPaymentAttribute newAttribute = new RMSPaymentAttribute();
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
+			newAttribute.setCreator(Context.getUserService().getUser(1));
+			newAttribute.setDateCreated(new Date());
 			newAttribute.setPayment(payment);
 			rmsPaymentAttributeService.savePaymentAttribute(newAttribute);
 		}

@@ -30,17 +30,15 @@
             <column name="searchable" not-null="true" />
         </property>
 
-        <property name="creator" type="java.lang.Integer">
-            <column name="creator" not-null="true" />
-        </property>
+        <many-to-one name="creator" class="org.openmrs.User" not-null="true">
+            <column name="creator" />
+        </many-to-one>
 
         <property name="dateCreated" type="java.util.Date">
             <column name="date_created" not-null="true" />
         </property>
 
-        <property name="changedBy" type="java.lang.Integer">
-            <column name="changed_by" />
-        </property>
+        <many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
 
         <property name="dateChanged" type="java.util.Date">
             <column name="date_changed" />
@@ -50,9 +48,7 @@
             <column name="retired" not-null="true" />
         </property>
 
-        <property name="retiredBy" type="java.lang.Integer">
-            <column name="retired_by" />
-        </property>
+        <many-to-one name="retiredBy" class="org.openmrs.User" column="retired_by"/>
 
         <property name="dateRetired" type="java.util.Date">
             <column name="date_retired" />

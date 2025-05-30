@@ -347,10 +347,11 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	@Override
 	public List<RMSBillAttribute> getAllBillAttributesByBillId(Integer billId, Boolean includeVoided) {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttribute.class);
-		criteria.add(Restrictions.eq("bill_id", billId));
-		criteria.add(Restrictions.eq("voided", includeVoided));
-		criteria.addOrder(org.hibernate.criterion.Order.asc("bill_attribute_id"));
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSBillAttribute.class, "attr");
+		criteria.createAlias("attr.bill", "bill");
+		criteria.add(Restrictions.eq("bill.id", billId));
+		criteria.add(Restrictions.eq("attr.voided", includeVoided));
+		criteria.addOrder(org.hibernate.criterion.Order.asc("attr.billAttributeId"));
 		return criteria.list();
 	}
 	

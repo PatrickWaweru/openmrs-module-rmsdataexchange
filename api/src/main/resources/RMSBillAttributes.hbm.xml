@@ -17,14 +17,16 @@
 
         <many-to-one name="attributeType" class="org.openmrs.module.rmsdataexchange.queue.model.RMSBillAttributeType" column="bill_attribute_type_id" not-null="true"/>
         
-        <property name="creator" column="creator" not-null="true"/>
+        <many-to-one name="creator" class="org.openmrs.User" not-null="true">
+            <column name="creator" />
+        </many-to-one>
         <property name="dateCreated" column="date_created" type="timestamp" not-null="true"/>
 
-        <property name="changedBy" column="changed_by"/>
+        <many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
         <property name="dateChanged" column="date_changed" type="timestamp"/>
 
         <property name="voided" column="voided" not-null="true"/>
-        <property name="voidedBy" column="voided_by"/>
+        <many-to-one name="voidedBy" class="org.openmrs.User" column="voided_by"/>
         <property name="dateVoided" column="date_voided" type="timestamp"/>
         <property name="voidReason" column="void_reason"/>
 

@@ -470,10 +470,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
 				
 				if (!testPatientSending) {
-					// Mark NOT sent using person attribute
-					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
-					Context.getPatientService().savePatient(patient);
+					
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send patient to RMS");
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
@@ -483,9 +480,15 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding patient to RMS Patient Queue");
+						// Mark sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add patient to RMS Patient Queue");
+						// Mark NOT sent using person attribute
+						AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+						    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				} else {
 					// Success sending the patient
@@ -495,7 +498,6 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					// Mark sent using person attribute
 					AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
 					    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
-					Context.getPatientService().savePatient(patient);
 				}
 				
 				sleepTime = AdviceUtils.getRandomInt(5000, 10000);
@@ -525,9 +527,6 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				} else {
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send Bill to RMS");
-					// Mark NOT sent using bill attribute
-					AdviceUtils.setBillAttributeValueByTypeUuid(bill,
-					    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
 					RMSQueueSystem rmsQueueSystem = rmsdataexchangeService
@@ -536,9 +535,15 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding bill to RMS Bill Queue");
+						// Mark NOT sent using bill attribute
+						AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+						    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add bill to RMS Bill Queue");
+						// Mark NOT sent using bill attribute
+						AdviceUtils.setBillAttributeValueByTypeUuid(bill,
+						    RMSModuleConstants.BILL_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				}
 				
@@ -566,9 +571,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
 					    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 				} else {
-					// Mark NOT sent using payment attribute
-					AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
-					    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+					
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Failed to send payment to RMS");
 					RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
@@ -578,9 +581,15 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					if (addToQueue) {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding payment to RMS payment Queue");
+						// Mark sent using payment attribute
+						AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+						    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add payment to RMS payment Queue");
+						// Mark NOT sent using payment attribute
+						AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+						    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				}
 			}

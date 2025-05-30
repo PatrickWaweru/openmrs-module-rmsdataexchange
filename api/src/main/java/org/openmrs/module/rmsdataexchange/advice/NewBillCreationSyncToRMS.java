@@ -74,7 +74,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 						}
 					} else {
 						if (debugMode)
-							System.out.println("rmsdataexchange Module: RMS: Error: Bill already sent to remote");
+							System.out.println("rmsdataexchange Module: RMS: Bill already sent to remote. We ignore");
 					}
 				}
 			}

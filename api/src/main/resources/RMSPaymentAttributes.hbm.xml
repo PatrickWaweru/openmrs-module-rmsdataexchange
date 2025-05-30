@@ -20,17 +20,15 @@
 
         <many-to-one name="attributeType" class="org.openmrs.module.rmsdataexchange.queue.model.RMSPaymentAttributeType" column="payment_attribute_type_id" not-null="true"/>
 
-        <property name="creator" type="java.lang.Integer">
-            <column name="creator" not-null="true" />
-        </property>
+        <many-to-one name="creator" class="org.openmrs.User" not-null="true">
+            <column name="creator" />
+        </many-to-one>
 
         <property name="dateCreated" type="java.util.Date">
             <column name="date_created" not-null="true" />
         </property>
 
-        <property name="changedBy" type="java.lang.Integer">
-            <column name="changed_by" />
-        </property>
+        <many-to-one name="changedBy" class="org.openmrs.User" column="changed_by"/>
 
         <property name="dateChanged" type="java.util.Date">
             <column name="date_changed" />
@@ -39,15 +37,10 @@
         <property name="voided" type="java.lang.Boolean">
             <column name="voided" not-null="true" />
         </property>
-
-        <property name="voidedBy" type="java.lang.Integer">
-            <column name="voided_by" />
-        </property>
-
+        <many-to-one name="voidedBy" class="org.openmrs.User" column="voided_by"/>
         <property name="dateVoided" type="java.util.Date">
             <column name="date_voided" />
         </property>
-
         <property name="voidReason" type="java.lang.String">
             <column name="void_reason" length="255" />
         </property>
