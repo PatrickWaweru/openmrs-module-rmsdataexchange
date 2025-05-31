@@ -215,10 +215,11 @@ public class RmsdataexchangeDaoImpl implements RmsdataexchangeDao {
 	
 	@Override
 	public List<RMSPaymentAttribute> getAllPaymentAttributesByPaymentId(Integer paymentId, Boolean includeVoided) {
-		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttribute.class);
-		criteria.add(Restrictions.eq("bill_payment_id", paymentId));
-		criteria.add(Restrictions.eq("voided", includeVoided));
-		criteria.addOrder(org.hibernate.criterion.Order.asc("payment_attribute_id"));
+		Criteria criteria = this.sessionFactory.getCurrentSession().createCriteria(RMSPaymentAttribute.class, "attr");
+		criteria.createAlias("attr.payment", "payment");
+		criteria.add(Restrictions.eq("payment.id", paymentId));
+		criteria.add(Restrictions.eq("attr.voided", includeVoided));
+		criteria.addOrder(org.hibernate.criterion.Order.asc("attr.paymentAttributeId"));
 		return criteria.list();
 	}
 	

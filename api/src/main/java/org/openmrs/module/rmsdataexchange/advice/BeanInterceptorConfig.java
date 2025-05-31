@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.Hibernate;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
 import org.openmrs.module.kenyaemr.cashier.api.IBillService;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
@@ -17,6 +19,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.interceptor.TransactionalProxy;
+import org.openmrs.module.rmsdataexchange.RmsdataexchangeActivator;
 import org.openmrs.module.rmsdataexchange.advice.NewBillPaymentSyncToRMS;
 
 public class BeanInterceptorConfig implements BeanPostProcessor {
@@ -77,6 +80,7 @@ public class BeanInterceptorConfig implements BeanPostProcessor {
 									}
 
 									if (debugMode) System.out.println("rmsdataexchange Module: Checking if there is need to Send payments to RMS");
+									System.err.println("Got daemon token as: " + RmsdataexchangeActivator.getDaemonToken());
 									NewBillPaymentSyncToRMS.checkPaymentsAndSendToRMS(paymentsBefore, paymentsAfter);
 								}
 							}
@@ -126,4 +130,5 @@ public class BeanInterceptorConfig implements BeanPostProcessor {
 			currentClass = currentClass.getSuperclass();
 		}
 	}
+	
 }

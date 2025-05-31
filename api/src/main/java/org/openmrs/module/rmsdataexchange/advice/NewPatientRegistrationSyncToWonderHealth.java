@@ -461,7 +461,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -600,7 +600,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -725,7 +725,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 				ex.printStackTrace();
 			}
 			finally {
-				Context.closeSession();
+				// Context.closeSession();
 			}
 		}
 	}

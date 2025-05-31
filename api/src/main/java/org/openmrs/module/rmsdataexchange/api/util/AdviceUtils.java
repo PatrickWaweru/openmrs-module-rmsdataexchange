@@ -8,14 +8,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Hibernate;
 import org.openmrs.GlobalProperty;
+import org.openmrs.Patient;
+import org.openmrs.PatientIdentifier;
 import org.openmrs.Person;
 import org.openmrs.PersonAttribute;
 import org.openmrs.PersonAttributeType;
+import org.openmrs.User;
 import org.openmrs.Visit;
 import org.openmrs.VisitAttribute;
 import org.openmrs.VisitAttributeType;
+import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.Daemon;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
 import org.openmrs.module.rmsdataexchange.api.RMSBillAttributeService;
@@ -335,7 +341,7 @@ public class AdviceUtils {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -444,19 +450,39 @@ public class AdviceUtils {
 	 * @param attributeTypeUuid
 	 * @param value
 	 */
-	public static void setPersonAttributeValueByTypeUuid(Person person, String attributeTypeUuid, String value) {
-		if (person == null || attributeTypeUuid == null || value == null) {
+	public static void setPersonAttributeValueByTypeUuid(Patient patient, String attributeTypeUuid, String value) {
+		if (patient == null || attributeTypeUuid == null || value == null) {
 			return;
 		}
 		
-		Context.openSession();
-		Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
-		Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
-		Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+		if (Context.isSessionOpen()) {
+			System.out.println("We have an open session 2");
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENT_IDENTIFIERS);
+		} else {
+			System.out.println("Error: We have NO open session 2");
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENT_IDENTIFIERS);
+		}
+		User currentUser = Daemon.getDaemonThreadUser();
+		System.out.println("Current user in session 2: " + (currentUser != null ? currentUser.getUsername() : ""));
+		
+		PatientService patientService = Context.getPatientService();
+		Patient localPatient = patientService.getPatient(patient.getId());
+		
 		PersonAttributeType attributeType = Context.getPersonService().getPersonAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
 			throw new IllegalArgumentException("No PersonAttributeType found for UUID: " + attributeTypeUuid);
@@ -464,26 +490,32 @@ public class AdviceUtils {
 		
 		PersonAttribute existingAttribute = null;
 		
-		for (PersonAttribute attr : person.getAttributes()) {
+		for (PersonAttribute attr : localPatient.getAttributes()) {
 			if (attributeType.equals(attr.getAttributeType())) {
 				existingAttribute = attr;
 				break;
 			}
 		}
 		
+		for (PatientIdentifier identifier : localPatient.getIdentifiers()) {
+			Hibernate.initialize(identifier.getIdentifierType());
+			System.err.println("Identifier type: " + identifier.getIdentifierType().getName());
+		}
+		
 		if (existingAttribute != null) {
 			existingAttribute.setValue(value); // updates existing
-			Context.getPersonService().savePerson(person);
+			Context.getPatientService().savePatient(localPatient);
 		} else {
 			PersonAttribute newAttribute = new PersonAttribute();
 			newAttribute.setAttributeType(attributeType);
 			newAttribute.setValue(value);
 			newAttribute.setCreator(Context.getUserService().getUser(1));
+			// newAttribute.setCreator(currentUser);
 			newAttribute.setDateCreated(new Date());
-			person.addAttribute(newAttribute); // inserts new
-			Context.getPersonService().savePerson(person);
+			localPatient.addAttribute(newAttribute); // inserts new attribute
+			Context.getPatientService().savePatient(localPatient);
 		}
-		Context.closeSession();
+		// Context.closeSession();
 	}
 	
 	/**
@@ -523,6 +555,14 @@ public class AdviceUtils {
 			return;
 		}
 		
+		Context.openSession();
+		Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+		Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+		Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+		Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
 		RMSBillAttributeService rmsBillAttributeService = Context.getService(RMSBillAttributeService.class);
 		RMSBillAttributeType attributeType = rmsBillAttributeService.getBillAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {

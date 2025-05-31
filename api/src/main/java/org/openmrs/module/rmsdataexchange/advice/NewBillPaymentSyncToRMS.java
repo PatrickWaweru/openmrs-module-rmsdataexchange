@@ -16,7 +16,13 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.Patient;
+import org.openmrs.User;
+import org.openmrs.api.context.AuthenticationScheme;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
+import org.openmrs.module.Module;
+import org.openmrs.module.ModuleFactory;
 import org.openmrs.module.kenyaemr.cashier.api.IBillService;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.Payment;
@@ -26,7 +32,11 @@ import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
 import org.openmrs.module.rmsdataexchange.api.util.SimpleObject;
 import org.openmrs.module.rmsdataexchange.queue.model.RMSQueueSystem;
 import org.openmrs.util.PrivilegeConstants;
+import org.openmrs.module.rmsdataexchange.RmsdataexchangeActivator;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
+import org.openmrs.api.context.Daemon;
+import org.openmrs.api.context.UserContext;
+import org.openmrs.api.context.Credentials;
 
 /**
  * Detects when a new payment has been made to a bill and syncs to RMS Financial System
@@ -97,8 +107,14 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 										// Use a thread to send the data. This frees up the frontend to proceed
 										String payload = prepareBillPaymentRMSPayload(payment);
 										syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
-										Thread thread = new Thread(runner);
-										thread.start();
+										// Thread thread = new Thread(runner);
+										// thread.start();
+										// Runnable daemonWrapped = () -> {
+												Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
+										// };
+
+										// Then run it
+										// new Thread(daemonWrapped).start();
 									} else {
 										if (debugMode)
 											System.out.println("rmsdataexchange Module: RMS: Error: Payment already sent to remote");
@@ -154,8 +170,9 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					// Use a thread to send the data. This frees up the frontend to proceed
 					String payload = prepareBillPaymentRMSPayload(payment);
 					syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
-					Thread thread = new Thread(runner);
-					thread.start();
+					// Thread thread = new Thread(runner);
+					// thread.start();
+					Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 				} else {
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: RMS: Error: Payment already sent to remote");
@@ -204,7 +221,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -421,7 +438,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -436,7 +453,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		
 		String payload = "";
 		
-		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
+		Boolean debugMode = false;
 		
 		public syncPaymentRunnable(@NotNull Payment payment, @NotNull String payload) {
 			this.payment = payment;
@@ -448,6 +465,32 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 			// Run the thread
 			
 			try {
+				// Context.openSession();
+				// Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+				// Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				if (Daemon.isDaemonThread()) {
+					System.out.println("This is a daemon thread");
+				} else {
+					System.out.println("This is NOT a daemon thread");
+				}
+				if (Context.isSessionOpen()) {
+					System.out.println("We have an open session 1");
+				} else {
+					System.out.println("Error: We have NO open session 1");
+					Context.openSession();
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				}
+				User current = Daemon.getDaemonThreadUser();
+				System.out.println("Current user in session 1: " + (current != null ? current.getUsername() : ""));
+				if (!Context.isAuthenticated()) {
+					System.out.println("context is NOT authenticated 1");
+				} else {
+					System.out.println("context is authenticated 1");
+				}
+				
+				debugMode = AdviceUtils.isRMSLoggingEnabled();
+				
 				if (debugMode)
 					System.out.println("rmsdataexchange Module: Start sending payment to RMS");
 				
@@ -467,6 +510,10 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				if (debugMode)
 					System.out.println("RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
 				Patient patient = payment.getBill().getPatient();
+				AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
+				    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+				if (debugMode)
+					System.out.println("rmsdataexchange Module: ZET TO ZERO");
 				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
 				
 				if (!testPatientSending) {

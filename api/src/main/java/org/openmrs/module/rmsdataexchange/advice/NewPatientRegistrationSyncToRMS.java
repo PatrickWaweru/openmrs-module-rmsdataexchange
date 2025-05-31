@@ -19,7 +19,9 @@ import org.hibernate.Hibernate;
 import org.openmrs.Patient;
 import org.openmrs.PatientIdentifier;
 import org.openmrs.PatientIdentifierType;
+import org.openmrs.User;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.Daemon;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
@@ -164,7 +166,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -194,8 +196,18 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			// Context.openSession();
+			// Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			// User current = Context.getAuthenticatedUser();
+			// System.out.println("Current user in session 2: " + (current != null ? current.getUsername() : ""));
+			if (Context.isSessionOpen()) {
+				System.out.println("We have an open session 3");
+			} else {
+				System.out.println("Error: We have NO open session 3");
+			}
+			User current = Daemon.getDaemonThreadUser();
+			System.out.println("Current user in session 3: " + (current != null ? current.getUsername() : ""));
+			
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using payload: " + payload);
@@ -380,7 +392,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);
@@ -400,9 +412,9 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		Hibernate.initialize(patient.getIdentifiers());
-		// Integer ids = patient.getIdentifiers().size();
-		// if (debugMode)
-		// 	System.out.println("rmsdataexchange Module: patient identifiers: " + ids);
+		Integer ids = patient.getIdentifiers().size();
+		if (debugMode)
+			System.out.println("rmsdataexchange Module: patient identifiers: " + ids);
 		
 		if (patientIdentifierType != null && patient != null) {
 			try {
@@ -422,7 +434,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			}
 			catch (Exception ex) {
 				if (debugMode)
-					System.err.println("rmsdataexchange Module: Getting the identifier: " + ex.getMessage());
+					System.err.println("rmsdataexchange Module: Error Getting the identifier: " + ex.getMessage());
 				ex.printStackTrace();
 			}
 		}

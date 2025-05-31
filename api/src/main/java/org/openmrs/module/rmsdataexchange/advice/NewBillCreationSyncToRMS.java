@@ -134,7 +134,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 			if(debugMode) System.err.println("rmsdataexchange Module: Error getting new bill payload: " + ex.getMessage());
             ex.printStackTrace();
 		} finally {
-            Context.closeSession();
+            // Context.closeSession();
         }
 
 		return (ret);
@@ -362,7 +362,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 			ex.printStackTrace();
 		}
 		finally {
-			Context.closeSession();
+			// Context.closeSession();
 		}
 		
 		return (ret);

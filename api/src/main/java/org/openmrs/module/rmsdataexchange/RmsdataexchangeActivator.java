@@ -12,6 +12,9 @@ package org.openmrs.module.rmsdataexchange;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.module.BaseModuleActivator;
+import org.openmrs.module.DaemonToken;
+import org.openmrs.module.DaemonTokenAware;
+import org.openmrs.module.rmsdataexchange.advice.BeanInterceptorConfig;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 
 import java.time.LocalDateTime;
@@ -20,9 +23,11 @@ import java.time.format.DateTimeFormatter;
 /**
  * This class contains the logic that is run every time this module is either started or shutdown
  */
-public class RmsdataexchangeActivator extends BaseModuleActivator {
+public class RmsdataexchangeActivator extends BaseModuleActivator implements DaemonTokenAware {
 	
 	private Log log = LogFactory.getLog(this.getClass());
+	
+	private static DaemonToken daemonToken;
 	
 	/**
 	 * @see #started()
@@ -65,4 +70,13 @@ public class RmsdataexchangeActivator extends BaseModuleActivator {
 		System.err.println("rmsdataexchange finished refreshing context: " + AdviceUtils.printCurrentDateTime());
 	}
 	
+	@Override
+	public void setDaemonToken(DaemonToken token) {
+		RmsdataexchangeActivator.daemonToken = token;
+		System.err.println("rmsdataexchange Module Got daemon token as: " + token);
+	}
+	
+	public static DaemonToken getDaemonToken() {
+		return daemonToken;
+	}
 }
