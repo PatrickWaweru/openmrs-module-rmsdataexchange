@@ -107,14 +107,7 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 										// Use a thread to send the data. This frees up the frontend to proceed
 										String payload = prepareBillPaymentRMSPayload(payment);
 										syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
-										// Thread thread = new Thread(runner);
-										// thread.start();
-										// Runnable daemonWrapped = () -> {
-												Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
-										// };
-
-										// Then run it
-										// new Thread(daemonWrapped).start();
+										Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 									} else {
 										if (debugMode)
 											System.out.println("rmsdataexchange Module: RMS: Error: Payment already sent to remote");
@@ -170,8 +163,6 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					// Use a thread to send the data. This frees up the frontend to proceed
 					String payload = prepareBillPaymentRMSPayload(payment);
 					syncPaymentRunnable runner = new syncPaymentRunnable(payment, payload);
-					// Thread thread = new Thread(runner);
-					// thread.start();
 					Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 				} else {
 					if (debugMode)
@@ -191,8 +182,14 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		String ret = "";
 		
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session D");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session D");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			
 			if (payment != null) {
@@ -252,8 +249,14 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session E");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session E");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using payment payload: " + payload);
@@ -465,28 +468,27 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 			// Run the thread
 			
 			try {
-				// Context.openSession();
-				// Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-				// Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 				if (Daemon.isDaemonThread()) {
-					System.out.println("This is a daemon thread");
+					System.out.println("rmsdataexchange Module: This is a daemon thread");
 				} else {
-					System.out.println("This is NOT a daemon thread");
+					System.out.println("rmsdataexchange Module: This is NOT a daemon thread");
 				}
 				if (Context.isSessionOpen()) {
-					System.out.println("We have an open session 1");
+					System.out.println("rmsdataexchange Module: We have an open session 1");
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 				} else {
-					System.out.println("Error: We have NO open session 1");
+					System.out.println("rmsdataexchange Module: Error: We have NO open session 1");
 					Context.openSession();
 					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 				}
 				User current = Daemon.getDaemonThreadUser();
-				System.out.println("Current user in session 1: " + (current != null ? current.getUsername() : ""));
+				System.out.println("rmsdataexchange Module: Current user in session 1: " + (current != null ? current.getUsername() : ""));
 				if (!Context.isAuthenticated()) {
-					System.out.println("context is NOT authenticated 1");
+					System.out.println("rmsdataexchange Module: context is NOT authenticated 1");
 				} else {
-					System.out.println("context is authenticated 1");
+					System.out.println("rmsdataexchange Module: context is authenticated 1");
 				}
 				
 				debugMode = AdviceUtils.isRMSLoggingEnabled();
@@ -508,12 +510,8 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				
 				// If the patient doesnt exist, send the patient to RMS
 				if (debugMode)
-					System.out.println("RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
+					System.out.println("rmsdataexchange Module: RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
 				Patient patient = payment.getBill().getPatient();
-				AdviceUtils.setPersonAttributeValueByTypeUuid(patient,
-				    RMSModuleConstants.PERSON_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
-				if (debugMode)
-					System.out.println("rmsdataexchange Module: ZET TO ZERO");
 				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
 				
 				if (!testPatientSending) {

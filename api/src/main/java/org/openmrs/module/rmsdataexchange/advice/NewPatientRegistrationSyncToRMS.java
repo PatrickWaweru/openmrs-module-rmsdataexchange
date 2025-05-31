@@ -22,6 +22,7 @@ import org.openmrs.PatientIdentifierType;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.context.Daemon;
+import org.openmrs.module.rmsdataexchange.RmsdataexchangeActivator;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
@@ -83,8 +84,7 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 									System.out.println("rmsdataexchange Module: patient identifiers: " + ids);
 								String payload = preparePatientRMSPayload(patient);
 								syncPatientRunnable runner = new syncPatientRunnable(payload, patient);
-								Thread thread = new Thread(runner);
-								thread.start();
+								Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 							} else {
 								// EDIT MODE
 								if (debugMode)
@@ -118,9 +118,16 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		String ret = "";
 		
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session F");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session F");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			
 			if (patient != null) {
@@ -196,17 +203,16 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
-			// Context.openSession();
-			// Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-			// User current = Context.getAuthenticatedUser();
-			// System.out.println("Current user in session 2: " + (current != null ? current.getUsername() : ""));
 			if (Context.isSessionOpen()) {
-				System.out.println("We have an open session 3");
+				System.out.println("rmsdataexchange Module: We have an open session 3");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 			} else {
-				System.out.println("Error: We have NO open session 3");
+				System.out.println("rmsdataexchange Module: Error: We have NO open session 3");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 			}
 			User current = Daemon.getDaemonThreadUser();
-			System.out.println("Current user in session 3: " + (current != null ? current.getUsername() : ""));
+			System.out.println("rmsdataexchange Module: Current user in session 3: " + (current != null ? current.getUsername() : ""));
 			
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
@@ -407,9 +413,16 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 	 */
 	private static String getPatientIdentifier(Patient patient, PatientIdentifierType patientIdentifierType) {
 		String ret = "";
-		Context.openSession();
-		Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		if (Context.isSessionOpen()) {
+			System.out.println("rmsdataexchange Module: We have an open session G");
+			Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		} else {
+			System.out.println("rmsdataexchange Module: Error: We have NO open session G");
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+		}
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 		Hibernate.initialize(patient.getIdentifiers());
 		Integer ids = patient.getIdentifiers().size();
@@ -463,9 +476,16 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			// Run the thread
 			
 			try {
-				Context.openSession();
-				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				if (Context.isSessionOpen()) {
+					System.out.println("rmsdataexchange Module: We have an open session H");
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				} else {
+					System.out.println("rmsdataexchange Module: Error: We have NO open session H");
+					Context.openSession();
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				}
 				debugMode = AdviceUtils.isRMSLoggingEnabled();
 				
 				if (debugMode)

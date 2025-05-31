@@ -48,10 +48,12 @@ import org.openmrs.Visit;
 import org.openmrs.VisitAttributeType;
 import org.openmrs.api.VisitService;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.Daemon;
 import org.openmrs.module.fhir2.FhirConstants;
 import org.openmrs.module.fhir2.api.translators.LocationTranslator;
 import org.openmrs.module.fhir2.api.translators.PatientTranslator;
 import org.openmrs.module.kenyaemr.cashier.util.Utils;
+import org.openmrs.module.rmsdataexchange.RmsdataexchangeActivator;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
@@ -158,8 +160,7 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 										String payload = preparePatientPayload(patient);
 										// Use a thread to send the data. This frees up the frontend to proceed
 										syncPatientRunnable runner = new syncPatientRunnable(payload, patient);
-										Thread thread = new Thread(runner);
-										thread.start();
+										Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 									} else {
 										if (debugMode)
 											System.out
@@ -206,13 +207,24 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 		Boolean debugMode = false;
 		
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIPS);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIP_TYPES);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSONS);
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session J");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIPS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIP_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSONS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session J");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_IDENTIFIER_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIPS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_RELATIONSHIP_TYPES);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSONS);
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			
 			if (patient != null) {
@@ -481,8 +493,14 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 		// HttpsURLConnection con = null;
 		HttpURLConnection connection = null;
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session K");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session K");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: Wonder Health using payload: " + payload);
@@ -663,9 +681,16 @@ public class NewPatientRegistrationSyncToWonderHealth implements AfterReturningA
 		public void run() {
 			
 			try {
-				Context.openSession();
-				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				if (Context.isSessionOpen()) {
+					System.out.println("rmsdataexchange Module: We have an open session L");
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				} else {
+					System.out.println("rmsdataexchange Module: Error: We have NO open session L");
+					Context.openSession();
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				}
 				debugMode = AdviceUtils.isRMSLoggingEnabled();
 				
 				if (debugMode)

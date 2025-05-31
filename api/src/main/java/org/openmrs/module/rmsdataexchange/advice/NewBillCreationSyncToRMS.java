@@ -17,10 +17,12 @@ import javax.validation.constraints.NotNull;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.openmrs.api.context.Context;
+import org.openmrs.api.context.Daemon;
 import org.openmrs.Concept;
 import org.openmrs.Patient;
 import org.openmrs.module.kenyaemr.cashier.api.model.Bill;
 import org.openmrs.module.kenyaemr.cashier.api.model.BillLineItem;
+import org.openmrs.module.rmsdataexchange.RmsdataexchangeActivator;
 import org.openmrs.module.rmsdataexchange.api.RmsdataexchangeService;
 import org.openmrs.module.rmsdataexchange.api.util.AdviceUtils;
 import org.openmrs.module.rmsdataexchange.api.util.RMSModuleConstants;
@@ -65,8 +67,7 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 							String payload = prepareNewBillRMSPayload(bill);
 							// Use a thread to send the data. This frees up the frontend to proceed
 							syncBillRunnable runner = new syncBillRunnable(bill, payload);
-							Thread thread = new Thread(runner);
-							thread.start();
+							Daemon.runInDaemonThread(runner, RmsdataexchangeActivator.getDaemonToken());
 						} else {
 							// EDIT Mode
 							if (debugMode)
@@ -90,8 +91,14 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		String ret = "";
 
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session A");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session A");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (bill != null) {
 				if(debugMode) System.out.println(
@@ -178,8 +185,14 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		HttpsURLConnection con = null;
 		HttpsURLConnection connection = null;
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session B");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session B");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
 				System.out.println("rmsdataexchange Module: using bill payload: " + payload);
@@ -388,9 +401,16 @@ public class NewBillCreationSyncToRMS implements AfterReturningAdvice {
 		public void run() {
 			
 			try {
-				Context.openSession();
-				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-				Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				if (Context.isSessionOpen()) {
+					System.out.println("rmsdataexchange Module: We have an open session C");
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				} else {
+					System.out.println("rmsdataexchange Module: Error: We have NO open session C");
+					Context.openSession();
+					Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+				}
 				debugMode = AdviceUtils.isRMSLoggingEnabled();
 				
 				if (debugMode)

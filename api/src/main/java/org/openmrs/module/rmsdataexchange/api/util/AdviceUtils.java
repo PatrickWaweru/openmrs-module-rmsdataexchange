@@ -105,11 +105,9 @@ public class AdviceUtils {
 	public static Boolean isRMSLoggingEnabled() {
 		Boolean ret = false;
 		
-		// Context.openSession();
 		GlobalProperty globalRMSEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_LOGGING_ENABLED);
 		String isRMSLoggingEnabled = globalRMSEnabled.getPropertyValue();
-		// Context.closeSession();
 		
 		if (isRMSLoggingEnabled != null && isRMSLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -126,11 +124,9 @@ public class AdviceUtils {
 	public static Boolean isRMSIntegrationEnabled() {
 		Boolean ret = false;
 		
-		// Context.openSession();
 		GlobalProperty globalRMSEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_SYNC_ENABLED);
 		String isRMSLoggingEnabled = globalRMSEnabled.getPropertyValue();
-		// Context.closeSession();
 		
 		if (isRMSLoggingEnabled != null && isRMSLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -147,11 +143,9 @@ public class AdviceUtils {
 	public static String getRMSEndpointURL() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_ENDPOINT_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
-		// Context.closeSession();
 		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = "https://siaya.tsconect.com/api";
@@ -169,11 +163,9 @@ public class AdviceUtils {
 	public static String getWonderHealthAuthURL() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDER_HEALTH_AUTH_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
-		// Context.closeSession();
 		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = " https://kenyafhirtest.iwonderpro.com/FHIRAPI/create/login";
@@ -191,11 +183,9 @@ public class AdviceUtils {
 	public static String getWonderHealthAuthToken() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDER_HEALTH_AUTH_TOKEN);
 		String token = globalPostUrl.getPropertyValue();
-		// Context.closeSession();
 		
 		if (!StringUtils.isEmpty(token)) {
 			ret = token;
@@ -212,11 +202,9 @@ public class AdviceUtils {
 	public static String getWonderHealthEndpointURL() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty globalPostUrl = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDERHEALTH_ENDPOINT_URL);
 		String baseURL = globalPostUrl.getPropertyValue();
-		// Context.closeSession();
 		
 		if (baseURL == null || baseURL.trim().isEmpty()) {
 			baseURL = "https://kenyafhirtest.iwonderpro.com/FHIRAPI/create";
@@ -234,11 +222,9 @@ public class AdviceUtils {
 	public static String getRMSAuthUserName() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty rmsUserGP = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_USERNAME);
 		String rmsUser = rmsUserGP.getPropertyValue();
-		// Context.closeSession();
 		
 		ret = (rmsUser == null || rmsUser.trim().isEmpty()) ? "" : rmsUser.trim();
 		
@@ -253,11 +239,9 @@ public class AdviceUtils {
 	public static String getRMSAuthPassword() {
 		String ret = "";
 		
-		// Context.openSession();
 		GlobalProperty rmsPasswordGP = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.RMS_PASSWORD);
 		String rmsPassword = rmsPasswordGP.getPropertyValue();
-		// Context.closeSession();
 		
 		ret = (rmsPassword == null || rmsPassword.trim().isEmpty()) ? "" : rmsPassword.trim();
 		
@@ -272,11 +256,9 @@ public class AdviceUtils {
 	public static Boolean isWonderHealthIntegrationEnabled() {
 		Boolean ret = false;
 		
-		// Context.openSession();
 		GlobalProperty globalWONDERHEALTHEnabled = Context.getAdministrationService().getGlobalPropertyObject(
 		    RMSModuleConstants.WONDERHEALTH_SYNC_ENABLED);
 		String isWONDERHEALTHLoggingEnabled = globalWONDERHEALTHEnabled.getPropertyValue();
-		// Context.closeSession();
 		
 		if (isWONDERHEALTHLoggingEnabled != null && isWONDERHEALTHLoggingEnabled.trim().equalsIgnoreCase("true")) {
 			ret = true;
@@ -310,8 +292,14 @@ public class AdviceUtils {
 		Boolean ret = false;
 		Boolean debugMode = false;
 		try {
-			Context.openSession();
-			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			if (Context.isSessionOpen()) {
+				System.out.println("rmsdataexchange Module: We have an open session M");
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			} else {
+				System.out.println("rmsdataexchange Module: Error: We have NO open session M");
+				Context.openSession();
+				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			}
 			debugMode = isRMSLoggingEnabled();
 			// get the system
 			RmsdataexchangeService rmsdataexchangeService = Context.getService(RmsdataexchangeService.class);
@@ -399,7 +387,7 @@ public class AdviceUtils {
 		
 		VisitAttributeType attributeType = Context.getVisitService().getVisitAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
-			throw new IllegalArgumentException("No VisitAttributeType found for UUID: " + attributeTypeUuid);
+			throw new IllegalArgumentException("rmsdataexchange Module: No VisitAttributeType found for UUID: " + attributeTypeUuid);
 		}
 		
 		VisitAttribute existingAttribute = null;
@@ -456,7 +444,7 @@ public class AdviceUtils {
 		}
 		
 		if (Context.isSessionOpen()) {
-			System.out.println("We have an open session 2");
+			System.out.println("rmsdataexchange Module: We have an open session 2");
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
 			Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
@@ -466,7 +454,7 @@ public class AdviceUtils {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENT_IDENTIFIERS);
 		} else {
-			System.out.println("Error: We have NO open session 2");
+			System.out.println("rmsdataexchange Module: Error: We have NO open session 2");
 			Context.openSession();
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
@@ -478,14 +466,14 @@ public class AdviceUtils {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENT_IDENTIFIERS);
 		}
 		User currentUser = Daemon.getDaemonThreadUser();
-		System.out.println("Current user in session 2: " + (currentUser != null ? currentUser.getUsername() : ""));
+		System.out.println("rmsdataexchange Module: Current user in session 2: " + (currentUser != null ? currentUser.getUsername() : ""));
 		
 		PatientService patientService = Context.getPatientService();
 		Patient localPatient = patientService.getPatient(patient.getId());
 		
 		PersonAttributeType attributeType = Context.getPersonService().getPersonAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
-			throw new IllegalArgumentException("No PersonAttributeType found for UUID: " + attributeTypeUuid);
+			throw new IllegalArgumentException("rmsdataexchange Module: No PersonAttributeType found for UUID: " + attributeTypeUuid);
 		}
 		
 		PersonAttribute existingAttribute = null;
@@ -499,7 +487,7 @@ public class AdviceUtils {
 		
 		for (PatientIdentifier identifier : localPatient.getIdentifiers()) {
 			Hibernate.initialize(identifier.getIdentifierType());
-			System.err.println("Identifier type: " + identifier.getIdentifierType().getName());
+			System.err.println("rmsdataexchange Module: Identifier type: " + identifier.getIdentifierType().getName());
 		}
 		
 		if (existingAttribute != null) {
@@ -555,14 +543,26 @@ public class AdviceUtils {
 			return;
 		}
 		
-		Context.openSession();
-		Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
-		Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
-		Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
-		Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+		if (Context.isSessionOpen()) {
+			System.out.println("rmsdataexchange Module: We have an open session N");
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+		} else {
+			System.out.println("rmsdataexchange Module: Error: We have NO open session N");
+			Context.openSession();
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
+			Context.addProxyPrivilege(PrivilegeConstants.EDIT_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.ADD_PERSONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_LOCATIONS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENTS);
+			Context.addProxyPrivilege(PrivilegeConstants.GET_USERS);
+		}
 		RMSBillAttributeService rmsBillAttributeService = Context.getService(RMSBillAttributeService.class);
 		RMSBillAttributeType attributeType = rmsBillAttributeService.getBillAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {

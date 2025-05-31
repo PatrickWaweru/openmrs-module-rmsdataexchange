@@ -41,7 +41,7 @@ public class RmsdataexchangeActivator extends BaseModuleActivator implements Dae
 	 * @see #shutdown()
 	 */
 	public void shutdown() {
-		log.info("Shutdown smsdataexchange Module");
+		log.info("Shutdown rmsdataexchange Module");
 		System.err.println("rmsdataexchange Module Shutdown: " + AdviceUtils.printCurrentDateTime());
 	}
 	
@@ -67,13 +67,13 @@ public class RmsdataexchangeActivator extends BaseModuleActivator implements Dae
 	
 	@Override
 	public void contextRefreshed() {
-		System.err.println("rmsdataexchange finished refreshing context: " + AdviceUtils.printCurrentDateTime());
+		System.err.println("rmsdataexchange Module finished refreshing context: " + AdviceUtils.printCurrentDateTime());
 	}
 	
 	@Override
 	public void setDaemonToken(DaemonToken token) {
 		RmsdataexchangeActivator.daemonToken = token;
-		System.err.println("rmsdataexchange Module Got daemon token as: " + token);
+		System.err.println("rmsdataexchange Module: Got daemon token as: " + token);
 	}
 	
 	public static DaemonToken getDaemonToken() {
