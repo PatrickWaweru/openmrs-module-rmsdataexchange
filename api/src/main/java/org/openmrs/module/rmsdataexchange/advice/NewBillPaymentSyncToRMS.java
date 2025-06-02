@@ -484,7 +484,8 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 					Context.addProxyPrivilege(PrivilegeConstants.GET_PERSON_ATTRIBUTE_TYPES);
 				}
 				User current = Daemon.getDaemonThreadUser();
-				System.out.println("rmsdataexchange Module: Current user in session 1: " + (current != null ? current.getUsername() : ""));
+				System.out.println("rmsdataexchange Module: Current user in session 1: "
+				        + (current != null ? current.getUsername() : ""));
 				if (!Context.isAuthenticated()) {
 					System.out.println("rmsdataexchange Module: context is NOT authenticated 1");
 				} else {
@@ -510,7 +511,8 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				
 				// If the patient doesnt exist, send the patient to RMS
 				if (debugMode)
-					System.out.println("rmsdataexchange Module: RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
+					System.out
+					        .println("rmsdataexchange Module: RMS Sync RMSDataExchange Module Bill Payment: Send the patient first");
 				Patient patient = payment.getBill().getPatient();
 				Boolean testPatientSending = NewPatientRegistrationSyncToRMS.sendRMSPatientRegistration(patient);
 				
@@ -607,14 +609,16 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 				// Now we can send the bill payment
 				Boolean testPaymentSending = sendRMSNewPayment(payment);
 				
+				// TODO: For now we disable setting payment attributes because of how cashier module handles partial payments i.e
+				// instead of updating previous payments, it deletes them (deleting id and uuid) and creates new ones this would conflict with attributes
 				if (testPaymentSending) {
 					// Success sending the payment
 					if (debugMode)
 						System.out.println("rmsdataexchange Module: Successfully Finished sending payment to RMS");
 					
 					// Mark sent using payment attribute
-					AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
-					    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
+					// AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+					//     RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 				} else {
 					
 					if (debugMode)
@@ -627,14 +631,14 @@ public class NewBillPaymentSyncToRMS implements MethodInterceptor {
 						if (debugMode)
 							System.out.println("rmsdataexchange Module: Finished adding payment to RMS payment Queue");
 						// Mark sent using payment attribute
-						AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
-						    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
+						// AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+						//     RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "1");
 					} else {
 						if (debugMode)
 							System.err.println("rmsdataexchange Module: Error: Failed to add payment to RMS payment Queue");
 						// Mark NOT sent using payment attribute
-						AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
-						    RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
+						// AdviceUtils.setPaymentAttributeValueByTypeUuid(payment,
+						//     RMSModuleConstants.PAYMENT_ATTRIBUTE_RMS_SYNCHRONIZED_UUID, "0");
 					}
 				}
 			}

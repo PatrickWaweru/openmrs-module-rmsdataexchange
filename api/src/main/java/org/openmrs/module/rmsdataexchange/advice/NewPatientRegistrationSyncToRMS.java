@@ -212,7 +212,8 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 				Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 			}
 			User current = Daemon.getDaemonThreadUser();
-			System.out.println("rmsdataexchange Module: Current user in session 3: " + (current != null ? current.getUsername() : ""));
+			System.out.println("rmsdataexchange Module: Current user in session 3: "
+			        + (current != null ? current.getUsername() : ""));
 			
 			debugMode = AdviceUtils.isRMSLoggingEnabled();
 			if (debugMode)
@@ -424,14 +425,16 @@ public class NewPatientRegistrationSyncToRMS implements AfterReturningAdvice {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_GLOBAL_PROPERTIES);
 		}
 		Boolean debugMode = AdviceUtils.isRMSLoggingEnabled();
-		Hibernate.initialize(patient.getIdentifiers());
-		Integer ids = patient.getIdentifiers().size();
+		Integer patId = patient.getId();
+		Patient localPatient = Context.getPatientService().getPatient(patId);
+		
+		Integer ids = localPatient.getIdentifiers().size();
 		if (debugMode)
 			System.out.println("rmsdataexchange Module: patient identifiers: " + ids);
 		
-		if (patientIdentifierType != null && patient != null) {
+		if (patientIdentifierType != null && localPatient != null) {
 			try {
-				Set<PatientIdentifier> identifiers = patient.getIdentifiers();
+				Set<PatientIdentifier> identifiers = localPatient.getIdentifiers();
 				
 				for (PatientIdentifier patientIdentifier : identifiers) {
 					if (!patientIdentifier.getVoided()

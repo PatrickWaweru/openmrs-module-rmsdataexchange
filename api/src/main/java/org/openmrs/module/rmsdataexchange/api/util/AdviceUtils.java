@@ -387,7 +387,8 @@ public class AdviceUtils {
 		
 		VisitAttributeType attributeType = Context.getVisitService().getVisitAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
-			throw new IllegalArgumentException("rmsdataexchange Module: No VisitAttributeType found for UUID: " + attributeTypeUuid);
+			throw new IllegalArgumentException("rmsdataexchange Module: No VisitAttributeType found for UUID: "
+			        + attributeTypeUuid);
 		}
 		
 		VisitAttribute existingAttribute = null;
@@ -466,14 +467,16 @@ public class AdviceUtils {
 			Context.addProxyPrivilege(PrivilegeConstants.GET_PATIENT_IDENTIFIERS);
 		}
 		User currentUser = Daemon.getDaemonThreadUser();
-		System.out.println("rmsdataexchange Module: Current user in session 2: " + (currentUser != null ? currentUser.getUsername() : ""));
+		System.out.println("rmsdataexchange Module: Current user in session 2: "
+		        + (currentUser != null ? currentUser.getUsername() : ""));
 		
 		PatientService patientService = Context.getPatientService();
 		Patient localPatient = patientService.getPatient(patient.getId());
 		
 		PersonAttributeType attributeType = Context.getPersonService().getPersonAttributeTypeByUuid(attributeTypeUuid);
 		if (attributeType == null) {
-			throw new IllegalArgumentException("rmsdataexchange Module: No PersonAttributeType found for UUID: " + attributeTypeUuid);
+			throw new IllegalArgumentException("rmsdataexchange Module: No PersonAttributeType found for UUID: "
+			        + attributeTypeUuid);
 		}
 		
 		PersonAttribute existingAttribute = null;
